@@ -39,7 +39,7 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<List<City>> GetCities()
         {
-            var query = @"SELECT * from Cities";
+            var query = @"SELECT * from Cities where IsActive = 1 ";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -56,43 +56,23 @@ namespace EarlyCare.Core.Repositories
             switch (hospitalFilters.BedType)
             {
                 case 1:
-                    whereCluase = " AND h.TotalIsolation > 0";
+                    whereCluase = " AND h.IsAvailableIsolationBed = 1";
                     break;
                 case 2:
-                    whereCluase = "AND h.TotalWithICU > 0"; 
+                    whereCluase = "AND h.IsAvailableICU = 1"; 
                     break;
                 case 3:
-                    whereCluase = "AND h.TotalWithOxygen > 0";
+                    whereCluase = "AND h.IsAvailableOxygen = 1";
                     break;
                 case 4:
-                    whereCluase = "AND h.TotalWithICUVentilator > 0";
+                    whereCluase = "AND h.IsAvailableICUVentilator = 1";
                     break;
                 default:
                     break;
             }
 
-            //switch (hospitalFilters.CityId)
-            //{
-            //    case 1:
-            //        whereCluase = " h.TotalIsolation > 0";
-            //        break;
-            //    case 2:
-            //        whereCluase = " h.TotalWithOxygen > 0";
-            //        break;
-            //    case 3:
-            //        whereCluase = " h.TotalWithICU > 0";
-            //        break;
-            //    case 4:
-            //        whereCluase = " h.TotalWithICUVentilator > 0";
-            //        break;
-            //    default:
-            //        whereCluase = " 1 == 0"; ;
-            //        break;
-            //}
 
-
-            var query = $@"select h.* , c.Name as City, case when h.hospitalType = 1 then 'Government Hospital' 
-                         else 'Private Hospital' end as HospitalType  from Hospitals h
+            var query = $@"select h.* , c.Name as City  from Hospitals h
                           join Cities c on c.id = h.CityId  where CityId = @cityId {whereCluase}";
 
             using (IDbConnection connection = await OpenConnectionAsync())
