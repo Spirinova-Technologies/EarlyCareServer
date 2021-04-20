@@ -6,7 +6,7 @@ namespace EarlyCare.Infrastructure.SharedModels
 {
     public class HospitalFilterModel
     {
-        public int BedType { get; set; }
+        public List<int> BedType { get; set; }
         public int CityId { get; set; }
     }
 }

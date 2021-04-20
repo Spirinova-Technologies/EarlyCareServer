@@ -27,5 +27,9 @@ namespace EarlyCare.Core.Models
         public int TotalWithOxygen { get; set; }
         public int TotalWithICU { get; set; }
         public int TotalWithICUVentilator { get; set; }
+        public bool IsAvailableIsolationBed { get; set; }
+        public bool IsAvailableICUVentilator { get; set; }
+        public bool IsAvailableICU { get; set; }
+        public bool IsAvailableOxygen { get; set; }
     }
 }

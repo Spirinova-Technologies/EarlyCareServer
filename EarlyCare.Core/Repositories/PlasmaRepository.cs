@@ -11,24 +11,26 @@ using System.Threading.Tasks;
 
 namespace EarlyCare.Core.Repositories
 {
-    public class CategoriesRepository : ConnectionRepository, ICategoriesRepository
+    public class PlasmaRepository : ConnectionRepository, IPlasmaRepository
     {
-        public CategoriesRepository(IConfiguration configuration) : base(configuration)
+        public PlasmaRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
-        public async Task<List<Category>> GetCategories()
+        public async Task<List<Plasma>> GetPlasmas(int cityId)
         {
-            var query = @"SELECT * FROM Categories where IsActive = 1";
+            var query = @"select * from Plasma
+                         where CityId = @cityId";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
-                var result = await connection.QueryAsync<Category>(query);
+                var result = await connection.QueryAsync<Plasma>(query, new
+                {
+                    cityId
+                });
 
                 return result.ToList();
             }
         }
-
-
     }
 }

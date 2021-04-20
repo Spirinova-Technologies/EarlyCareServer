@@ -53,22 +53,25 @@ namespace EarlyCare.Core.Repositories
         {
             string whereCluase = string.Empty;
 
-            switch (hospitalFilters.BedType)
+            foreach (var bedType in hospitalFilters.BedType)
             {
-                case 1:
-                    whereCluase = " AND h.IsAvailableIsolationBed = 1";
-                    break;
-                case 2:
-                    whereCluase = "AND h.IsAvailableICU = 1"; 
-                    break;
-                case 3:
-                    whereCluase = "AND h.IsAvailableOxygen = 1";
-                    break;
-                case 4:
-                    whereCluase = "AND h.IsAvailableICUVentilator = 1";
-                    break;
-                default:
-                    break;
+                switch (bedType)
+                {
+                    case 1:
+                        whereCluase += " AND h.IsAvailableIsolationBed = 1";
+                        break;
+                    case 2:
+                        whereCluase += " AND h.IsAvailableICU = 1";
+                        break;
+                    case 3:
+                        whereCluase += " AND h.IsAvailableOxygen = 1";
+                        break;
+                    case 4:
+                        whereCluase += " AND h.IsAvailableICUVentilator = 1";
+                        break;
+                    default:
+                        break;
+                }
             }
 
 

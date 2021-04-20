@@ -42,7 +42,7 @@ namespace EarlyCare.WebApi
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IHospitalRepository, HospitalRepository>();
             services.AddTransient<ICategoriesRepository, CategoriesRepository>();
-
+            services.AddTransient<IPlasmaRepository, PlasmaRepository>();
 
             #endregion Services
 
