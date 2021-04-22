@@ -4,6 +4,7 @@ using EarlyCare.Core.Models;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace EarlyCare.WebApi.Controllers
@@ -70,7 +71,7 @@ namespace EarlyCare.WebApi.Controllers
         }
 
         [HttpGet("getVolunteer")]
-        public async Task<IActionResult> GetVolunteers(int volunteerId)
+        public async Task<IActionResult> GetVolunteers([Required]  int volunteerId)
         {
             var response = await _userService.GetVolunteer(volunteerId);
 

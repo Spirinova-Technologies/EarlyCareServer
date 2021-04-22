@@ -11,25 +11,25 @@ using Microsoft.Extensions.Logging;
 
 namespace EarlyCare.WebApi.Controllers
 {
-    [Route("api/plasma")]
+    [Route("api/tiffin")]
     [ApiController]
-    public class PlasmaController : ControllerBase
+    public class TiffinController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IPlasmaRepository _plasmaRepository;
-        private readonly ILogger<PlasmaController> _logger;
+        private readonly ITiffinRepository _tiffinRepository;
+        private readonly ILogger<TiffinController> _logger;
 
-        public PlasmaController(IMapper mapper, ILogger<PlasmaController> logger, IPlasmaRepository plasmaRepository)
+        public TiffinController(IMapper mapper, ILogger<TiffinController> logger, ITiffinRepository tiffinRepository)
         {
             _mapper = mapper;
             _logger = logger;
-            _plasmaRepository = plasmaRepository;
+            _tiffinRepository = tiffinRepository;
         }
 
-        [HttpGet("getPlasmas")]
-        public async Task<IActionResult> GetPlasmas([Required]  int cityId)
+        [HttpGet("getTiffins")]
+        public async Task<IActionResult> GetTiffins([Required] int cityId)
         {
-            var response = await _plasmaRepository.GetPlasmas(cityId);
+            var response = await _tiffinRepository.GetTiffins(cityId);
 
             return Ok(response);
         }

@@ -80,14 +80,13 @@ namespace EarlyCare.Core.Repositories
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
-                var result = await connection.QueryAsync<Hospital>(query, new {
-                    cityId= hospitalFilters.CityId
+                var result = await connection.QueryAsync<Hospital>(query, new
+                {
+                    cityId = hospitalFilters.CityId
                 });
 
                 return result.ToList();
             }
         }
-
-
     }
 }
