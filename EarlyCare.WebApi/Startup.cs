@@ -45,8 +45,9 @@ namespace EarlyCare.WebApi
             services.AddTransient<IPlasmaRepository, PlasmaRepository>();
             services.AddTransient<IAmbulanceRepository, AmbulanceRepository>();
             services.AddTransient<IRtpcrTestRepository, RtpcrTestRepository>();
-            services.AddTransient<ITiffinRepository, TiffinRepository>();
-
+            services.AddTransient<IFoodRepository, FoodRepository>();
+            services.AddTransient<IMedicalEquipmentRepository, MedicalEquipmentRepository>();
+            services.AddTransient<IOxygenProviderRepository, OxygenProviderRepository>();
 
             #endregion Services
 

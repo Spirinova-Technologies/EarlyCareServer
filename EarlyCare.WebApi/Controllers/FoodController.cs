@@ -11,25 +11,25 @@ using Microsoft.Extensions.Logging;
 
 namespace EarlyCare.WebApi.Controllers
 {
-    [Route("api/tiffin")]
+    [Route("api/food")]
     [ApiController]
-    public class TiffinController : ControllerBase
+    public class FoodController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly ITiffinRepository _tiffinRepository;
-        private readonly ILogger<TiffinController> _logger;
+        private readonly IFoodRepository _foodRepository;
+        private readonly ILogger<FoodController> _logger;
 
-        public TiffinController(IMapper mapper, ILogger<TiffinController> logger, ITiffinRepository tiffinRepository)
+        public FoodController(IMapper mapper, ILogger<FoodController> logger, IFoodRepository foodRepository)
         {
             _mapper = mapper;
             _logger = logger;
-            _tiffinRepository = tiffinRepository;
+            _foodRepository = foodRepository;
         }
 
-        [HttpGet("getTiffins")]
-        public async Task<IActionResult> GetTiffins([Required] int cityId)
+        [HttpGet("getFoods")]
+        public async Task<IActionResult> GetFoods([Required] int cityId)
         {
-            var response = await _tiffinRepository.GetTiffins(cityId);
+            var response = await _foodRepository.GetFoods(cityId);
 
             return Ok(response);
         }
