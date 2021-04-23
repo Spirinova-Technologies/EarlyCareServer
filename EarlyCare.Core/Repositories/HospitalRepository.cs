@@ -58,20 +58,29 @@ namespace EarlyCare.Core.Repositories
                 switch (bedType)
                 {
                     case 1:
-                        whereCluase += " AND h.IsAvailableIsolationBed = 1";
+                        whereCluase += string.IsNullOrWhiteSpace(whereCluase)? " AND (h.IsAvailableIsolationBed = 1" 
+                            : " OR  h.IsAvailableIsolationBed = 1";
                         break;
                     case 2:
-                        whereCluase += " AND h.IsAvailableICU = 1";
+                        whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableICU = 1"
+                            : " OR  h.IsAvailableICU = 1";
                         break;
                     case 3:
-                        whereCluase += " AND h.IsAvailableOxygen = 1";
+                        whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableOxygen = 1"
+                            : " OR  h.IsAvailableOxygen = 1"; 
                         break;
                     case 4:
-                        whereCluase += " AND h.IsAvailableICUVentilator = 1";
+                        whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableICUVentilator = 1"
+                            : " OR  h.IsAvailableICUVentilator = 1";
                         break;
                     default:
                         break;
                 }
+            }
+
+            if(whereCluase.Contains("("))
+            {
+                whereCluase += " )";
             }
 
 
