@@ -53,6 +53,7 @@ namespace EarlyCare.WebApi
             services.AddTransient<IConsultationRepository, ConsultationRepository>();
             services.AddTransient<IGoogleSheetRepository, GoogleSheetRepository>();
             services.AddTransient<IDrugsRepository, DrugsRepository>();
+            services.AddTransient<IOtherEssentialsRepository, OtherEssentialsRepository>();
 
             #endregion Services
 
