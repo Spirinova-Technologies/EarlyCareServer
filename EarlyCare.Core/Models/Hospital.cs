@@ -12,12 +12,14 @@ namespace EarlyCare.Core.Models
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public string City { get; set; }
+        public int CityId { get; set; }
         public string PhoneNumber1 { get; set; }
         public string PhoneNumber2 { get; set; }
         public string PhoneNumber3 { get; set; }
         public string PhoneNumber4 { get; set; }
         public DateTime ModifiedAt { get; set; }
-        public string UpdatedBy { get; set; }
+        public int UpdatedBy { get; set; }
+        public int CreatedBy { get; set; }
         public string HospitalType { get; set; }
         public int VacantIsolation { get; set; }
         public int VacantWithOxygen { get; set; }

@@ -14,4 +14,15 @@ namespace EarlyCare.Infrastructure.Constants
         public static string OxigenBed = "Oxigen Bed";
         public static string VentilatorBeds = "VentilatorBeds";
     }
+
+    public static class GoogleSheetNameConstants {
+        public static string HospitalsBeds = "HospitalsBeds";
+        public static string PlasmaDonors = "PlasmaDonors";
+        public static string MedicalEquipment = "MedicalEquipment";
+        public static string MedicalOxygenProvider = "MedicalOxygenProvider";
+        public static string FoodPackets = "FoodPackets";
+        public static string AmbulanceProvider = "AmbulanceProvider";
+        public static string COVIDConsultancyDoc = "COVIDConsultancyDoc";
+    }
+
 }

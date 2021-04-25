@@ -1,13 +1,10 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
-using EarlyCare.Core.Models;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EarlyCare.Core.Repositories

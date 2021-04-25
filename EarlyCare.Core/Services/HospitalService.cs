@@ -26,6 +26,7 @@ namespace EarlyCare.Core.Services
 
         public async Task<List<City>> GetCities()
         {
+            _logger.LogInformation("Retrieving cities");
             return await _hospitalRepository.GetCities();
         }
 

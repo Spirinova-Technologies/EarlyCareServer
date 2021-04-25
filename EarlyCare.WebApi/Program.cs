@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Formatting.Compact;
 
 namespace EarlyCare.WebApi
 {
@@ -13,11 +15,26 @@ namespace EarlyCare.WebApi
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .WriteTo.File("/logs/earlycare_.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+            try
+            {
+                CreateHostBuilder(args).Build().Run();
+                Log.Information("Application started.");
+            }
+            catch(Exception ex)
+            {
+                Log.Error("Error occured while starting application ", ex);
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

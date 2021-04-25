@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace EarlyCare.WebApi
 {
@@ -36,6 +37,7 @@ namespace EarlyCare.WebApi
             services.AddTransient<IOtpService, OtpService>();
             services.AddTransient<IGlobalSettingService, GlobalSettingService>();
             services.AddTransient<IHospitalService, HospitalService>();
+            services.AddTransient<IGoogleSheetService, GoogleSheetService>();
 
             services.AddTransient<IGlobalSettingsRepository, GlobalSettingsRepository>();
             services.AddTransient<IOtpRepository, OtpRepository>();
@@ -49,6 +51,8 @@ namespace EarlyCare.WebApi
             services.AddTransient<IMedicalEquipmentRepository, MedicalEquipmentRepository>();
             services.AddTransient<IOxygenProviderRepository, OxygenProviderRepository>();
             services.AddTransient<IConsultationRepository, ConsultationRepository>();
+            services.AddTransient<IGoogleSheetRepository, GoogleSheetRepository>();
+            services.AddTransient<IDrugsRepository, DrugsRepository>();
 
             #endregion Services
 
@@ -72,6 +76,8 @@ namespace EarlyCare.WebApi
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                  );
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
