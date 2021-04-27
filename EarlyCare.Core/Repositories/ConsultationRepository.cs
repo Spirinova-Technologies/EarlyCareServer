@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
+using EarlyCare.Core.Models;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,6 +15,18 @@ namespace EarlyCare.Core.Repositories
     {
         public ConsultationRepository(IConfiguration configuration) : base(configuration)
         {
+        }
+
+        public async Task<Consultation> GetConsultationDetails(string name)
+        {
+            var query = @"SELECT * from Consultation where TRIM(DoctorName) = @name ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<Consultation>(query, new { name = name.Trim() });
+
+                return result.FirstOrDefault();
+            }
         }
 
         public async Task<List<ConsultationResponseModel>> GetConsultations(int cityId)
@@ -27,6 +41,70 @@ namespace EarlyCare.Core.Repositories
                 });
 
                 return result.ToList();
+            }
+        }
+
+        public async Task<Consultation> InsertConsultation(Consultation consultation)
+        {
+            try
+            {
+                var query = @"INSERT into Consultation (DoctorName, Area, PhoneNumber, Charges, GovRegistraionNumber, Type,  IsVerified, CreatedOn, UpdatedOn,
+                             CreatedBy, UpdatedBy,  CityId )
+                          Values (@name,@area, @phoneNumber, @charges, @govRegistraionNumber, @type, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @cityId)";
+
+                using (IDbConnection connection = await OpenConnectionAsync())
+                {
+                    var result = await connection.QueryAsync<Consultation>(query, new
+                    {
+                        name = consultation.DoctorName,
+                        area = consultation.Area,
+                        phoneNumber = consultation.PhoneNumber,
+                        charges = consultation.Charges,
+                        govRegistraionNumber = consultation.GovRegistraionNumber,
+                        type = consultation.Type,
+                        isVerified = consultation.IsVerified,
+                        createdOn = DateTime.Now,
+                        updatedOn = DateTime.Now,
+                        createdBy = 0,
+                        updatedBy = 0,
+                        cityId = consultation.CityId
+                    });
+
+                    return result.FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Consultation> UpdateConsultation(Consultation consultation)
+        {
+            var query = @"Update  Consultation set DoctorName =@name, Area =@area, PhoneNumber =@phoneNumber, Charges =@charges,GovRegistraionNumber = @govRegistraionNumber,
+                              Type =@type, IsVerified =@isVerified,UpdatedOn=@updatedOn,  UpdatedBy =@updatedBy, CityId = @cityId 
+                         where Id = @id";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<Consultation>(query, new
+                {
+                    id = consultation.Id,
+                    name = consultation.DoctorName,
+                    area = consultation.Area,
+                    phoneNumber = consultation.PhoneNumber,
+                    charges = consultation.Charges,
+                    govRegistraionNumber = consultation.GovRegistraionNumber,
+                    type = consultation.Type,
+                    isVerified = consultation.IsVerified,
+                    createdOn = DateTime.Now,
+                    updatedOn = DateTime.Now,
+                    createdBy = 0,
+                    updatedBy = 0,
+                    cityId = consultation.CityId
+                });
+
+                return result.FirstOrDefault();
             }
         }
     }

@@ -9,7 +9,7 @@ namespace EarlyCare.Core.Interfaces
     {
         Task<BedCountDetails> GetBedCounts(int cityId);
 
-        Task<List<Hospital>> SearchHospitals(HospitalFilterModel hospitalFilters);
+        Task<List<HospitalResponseModel>> SearchHospitals(HospitalFilterModel hospitalFilters);
 
         Task<List<City>> GetCities();
 

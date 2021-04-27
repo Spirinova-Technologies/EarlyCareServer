@@ -12,7 +12,8 @@
         HospitalsBeds,
         PlasmaDonors,
         MedicalEquipment,
-        MedicalOxygenProvider,
+        Remdesivir,
+        OxygenProvider,
         FoodPackets,
         AmbulanceProvider,
         COVIDConsultancyDoc

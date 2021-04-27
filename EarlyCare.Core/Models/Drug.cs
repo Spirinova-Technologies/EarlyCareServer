@@ -2,16 +2,14 @@
 
 namespace EarlyCare.Core.Models
 {
-    public class Ambulance
+    public class Drug
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Area { get; set; }
+        public string SupplierName { get; set; }
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
-        public string AmbulanceType { get; set; }
-        public string NumberOfAmbulances { get; set; }
-        public string ProviderType { get; set; }
+        public string Coordinator { get; set; }
+        public string GovPhoneNumber { get; set; }
         public int CityId { get; set; }
         public bool IsVerified { get; set; }
         public DateTime CreatedOn { get; set; }

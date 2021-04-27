@@ -30,7 +30,7 @@ namespace EarlyCare.Core.Services
             return await _hospitalRepository.GetCities();
         }
 
-        public async Task<List<Hospital>> SearchHospitals(HospitalFilterModel hospitalFilters)
+        public async Task<List<HospitalResponseModel>> SearchHospitals(HospitalFilterModel hospitalFilters)
         {
             return await _hospitalRepository.SearchHospitals(hospitalFilters);
         }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EarlyCare.Core.Interfaces;
+using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -21,12 +22,15 @@ namespace EarlyCare.WebApi.Controllers
             _googleSheetService = googleSheetService;
         }
 
-        [HttpGet("saveGoogleSheetData")]
-        public async Task<IActionResult> GetCategories()
+        [HttpPost("saveGoogleSheetData")]
+        public async Task<IActionResult> SaveGoogleSheetData(GoogleSheetRequestModel googleSheetRequestModel)
         {
             var response = await _googleSheetService.GetGoogleSheetData();
 
-            return Ok(response);
+            return Ok(new BaseResponseModel
+            {
+                Message = "Data saved successfully"
+            });
         }
     }
 }

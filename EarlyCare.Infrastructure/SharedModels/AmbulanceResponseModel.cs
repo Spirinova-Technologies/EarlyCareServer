@@ -13,6 +13,7 @@ namespace EarlyCare.Infrastructure.SharedModels
         public string UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
         public string AmbulanceType { get; set; }
+        public string ProviderType { get; set; }
         public string City { get; set; }
     }
 }

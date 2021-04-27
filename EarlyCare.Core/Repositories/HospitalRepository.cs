@@ -83,7 +83,7 @@ namespace EarlyCare.Core.Repositories
                     phoneNumber3 = hospital.PhoneNumber3,
                     phoneNumber4 = hospital.PhoneNumber4,
                     createdAt = DateTime.Now,
-                    modifiedAt = DateTime.Now,
+                    modifiedAt = hospital.ModifiedAt,
                     createdBy = hospital.CreatedBy,
                     updatedBy = hospital.UpdatedBy,
                     hospitalType = hospital.HospitalType,
@@ -114,12 +114,12 @@ namespace EarlyCare.Core.Repositories
                     address = hospital.Address,
                     latitude = hospital.Latitude,
                     longitude = hospital.Longitude,
-                    cityId = hospital.City,
+                    cityId = hospital.CityId,
                     phoneNumber1 = hospital.PhoneNumber1,
                     phoneNumber2 = hospital.PhoneNumber2,
                     phoneNumber3 = hospital.PhoneNumber3,
                     phoneNumber4 = hospital.PhoneNumber4,
-                    modifiedAt = DateTime.Now,
+                    modifiedAt = hospital.ModifiedAt,
                     createdBy = hospital.CreatedBy,
                     updatedBy = hospital.UpdatedBy,
                     hospitalType = hospital.HospitalType,
@@ -133,42 +133,49 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
-        public async Task<List<Hospital>> SearchHospitals(HospitalFilterModel hospitalFilters)
+        public async Task<List<HospitalResponseModel>> SearchHospitals(HospitalFilterModel hospitalFilters)
         {
             string whereCluase = string.Empty;
 
-            foreach (var bedType in hospitalFilters.BedType)
+            if (hospitalFilters.BedType.Count == 0)
             {
-                switch (bedType)
-                {
-                    case 1:
-                        whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableIsolationBed = 1"
-                            : " OR  h.IsAvailableIsolationBed = 1";
-                        break;
-
-                    case 2:
-                        whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableICU = 1"
-                            : " OR  h.IsAvailableICU = 1";
-                        break;
-
-                    case 3:
-                        whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableOxygen = 1"
-                            : " OR  h.IsAvailableOxygen = 1";
-                        break;
-
-                    case 4:
-                        whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableICUVentilator = 1"
-                            : " OR  h.IsAvailableICUVentilator = 1";
-                        break;
-
-                    default:
-                        break;
-                }
+                whereCluase = " AND 1 = 0";
             }
-
-            if (whereCluase.Contains("("))
+            else if (!hospitalFilters.BedType.Contains(0))
             {
-                whereCluase += " )";
+                foreach (var bedType in hospitalFilters.BedType)
+                {
+                    switch (bedType)
+                    {
+                        case 1:
+                            whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableIsolationBed = 1"
+                                : " OR  h.IsAvailableIsolationBed = 1";
+                            break;
+
+                        case 2:
+                            whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableICU = 1"
+                                : " OR  h.IsAvailableICU = 1";
+                            break;
+
+                        case 3:
+                            whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableOxygen = 1"
+                                : " OR  h.IsAvailableOxygen = 1";
+                            break;
+
+                        case 4:
+                            whereCluase += string.IsNullOrWhiteSpace(whereCluase) ? " AND (h.IsAvailableICUVentilator = 1"
+                                : " OR  h.IsAvailableICUVentilator = 1";
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                if (whereCluase.Contains("("))
+                {
+                    whereCluase += " )";
+                }
             }
 
             var query = $@"select h.* , c.Name as City  from Hospitals h
@@ -176,7 +183,7 @@ namespace EarlyCare.Core.Repositories
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
-                var result = await connection.QueryAsync<Hospital>(query, new
+                var result = await connection.QueryAsync<HospitalResponseModel>(query, new
                 {
                     cityId = hospitalFilters.CityId
                 });
