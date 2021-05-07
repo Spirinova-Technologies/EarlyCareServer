@@ -28,5 +28,14 @@ namespace EarlyCare.WebApi.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("getServices")]
+        public async Task<IActionResult> GetServices()
+        {
+            var response = await _categoriesRepository.GetServices();
+
+            return Ok(response);
+        }
+
     }
 }

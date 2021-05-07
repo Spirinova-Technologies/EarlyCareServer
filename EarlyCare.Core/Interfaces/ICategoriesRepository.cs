@@ -7,5 +7,6 @@ namespace EarlyCare.Core.Interfaces
     public interface ICategoriesRepository
     {
         Task<List<Category>> GetCategories();
+        Task<List<Service>> GetServices();
     }
 }

@@ -11,5 +11,6 @@ namespace EarlyCare.Core.Interfaces
         Task<OxygenProvider> InsertOxygenProvider(OxygenProvider  oxygenProvider);
         Task<OxygenProvider> UpdateOxygenProvider(OxygenProvider oxygenProvider);
         Task<OxygenProvider> GetOxygenProviderByName(string name);
+        Task<OxygenProvider> GetOxygenProviderByUserId(int userId);
     }
 }

@@ -10,5 +10,8 @@ namespace EarlyCare.Core.Interfaces
         Task<User> InsertUser(User user);
         Task<List<User>> GetVolunteers();
         Task<User> GetVolunteer(int volunteerId);
+        Task<bool> IsEmailIdExists(string emailId);
+        Task InsertUserServiceData(UserServiceData userServiceData);
+        Task<List<Service>> GetUsersServices(int userId);
     }
 }

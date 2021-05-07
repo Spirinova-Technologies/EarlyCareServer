@@ -14,5 +14,6 @@ namespace EarlyCare.Core.Interfaces
         Task<Plasma> InsertPlasma(Plasma plasma);
         Task<Plasma> UpdatePlasma(Plasma plasma);
         Task<Plasma> GetPlasmaDonorByName(string name);
+        Task<Plasma> GetPlasmaByUserId(int userId);
     }
 }

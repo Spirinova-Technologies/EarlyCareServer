@@ -1,7 +1,6 @@
 ﻿using EarlyCare.Core.Models;
-using System;
+using EarlyCare.Infrastructure.SharedModels;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EarlyCare.Core.Interfaces
@@ -12,5 +11,6 @@ namespace EarlyCare.Core.Interfaces
         Task<User> InsertUser(User user);
         Task<List<User>> GetVolunteers();
         Task<User> GetVolunteer(int volunteerId);
+        UserResponseModel GenerateUserResponse(User user, List<Service> services);
     }
 }

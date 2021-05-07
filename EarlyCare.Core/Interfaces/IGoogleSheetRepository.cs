@@ -8,5 +8,6 @@ namespace EarlyCare.Core.Interfaces
     public interface IGoogleSheetRepository
     {
         Task<List<GoogleSheet>> GetGoogleSheets();
+        Task<GoogleSheet> GetGoogleSheetByName(string name);
     }
 }

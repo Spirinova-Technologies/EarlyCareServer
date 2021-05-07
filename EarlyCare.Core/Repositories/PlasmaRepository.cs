@@ -37,6 +37,23 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
+        public async Task<Plasma> GetPlasmaByUserId(int userId)
+        {
+            var query = @"select p.* from PlasmaDonor p
+                          join User u on u.id = p.CreatedBy
+                          where u.Id = @userId ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<Plasma>(query, new
+                {
+                    userId
+                });
+
+                return result.FirstOrDefault();
+            }
+        }
+
         public async Task<Plasma> GetPlasmaDonorByName(string name)
         {
             var query = @"SELECT * from PlasmaDonor where TRIM(Name) = @name ";
@@ -56,7 +73,9 @@ namespace EarlyCare.Core.Repositories
                 var query = @"INSERT into PlasmaDonor (Name, Address, BloodGroup, PhoneNumber, IsRtpcrReportAvailable, IsAntibodyReportAvailable, CovidPositiveDate,
                             CovidNegativeDate, IsVerified, CreatedOn, UpdatedOn, CreatedBy, UpdatedBy, DonorType, CityId )
                           Values (@name, @address, @bloodGroup, @phoneNumber, @isRtpcrReportAvailable, @isAntibodyReportAvailable, @covidPositiveDate,
-                            @covidNegativeDate, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @donorType, @cityId)";
+                            @covidNegativeDate, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @donorType, @cityId);
+
+                            Select * FROM PlasmaDonor where id =(select LAST_INSERT_ID());";
 
                 using (IDbConnection connection = await OpenConnectionAsync())
                 {
@@ -73,8 +92,8 @@ namespace EarlyCare.Core.Repositories
                         isVerified = plasma.IsVerified,
                         createdOn = DateTime.Now,
                         updatedOn = DateTime.Now,
-                        createdBy = 0,
-                        updatedBy = 0,
+                        createdBy = plasma.CreatedBy,
+                        updatedBy = plasma.UpdatedBy,
                         donorType = plasma.DonorType,
                         cityId = plasma.CityId
                     });
@@ -95,7 +114,9 @@ namespace EarlyCare.Core.Repositories
                 var query = @"UPDATE PlasmaDonor set Name = @name, Address = @address, BloodGroup =@bloodGroup, PhoneNumber =@phoneNumber, IsRtpcrReportAvailable = @isRtpcrReportAvailable,
                             IsAntibodyReportAvailable = @isAntibodyReportAvailable,CovidPositiveDate = @covidPositiveDate,
                             CovidNegativeDate =@covidNegativeDate,IsVerified = @isVerified, UpdatedOn =@updatedOn,  UpdatedBy= @updatedBy,  DonorType = @donorType,CityId = @cityId
-                         Where Id= @id";
+                         Where Id= @id;
+
+                          Select * FROM PlasmaDonor where id = @id;";
 
                 using (IDbConnection connection = await OpenConnectionAsync())
                 {
@@ -112,7 +133,7 @@ namespace EarlyCare.Core.Repositories
                         covidNegativeDate = plasma.CovidNegativeDate,
                         isVerified = plasma.IsVerified,
                         updatedOn = DateTime.Now,
-                        updatedBy = 0,
+                        updatedBy = plasma.UpdatedBy,
                         donorType = plasma.DonorType,
                         cityId = plasma.CityId
                     });

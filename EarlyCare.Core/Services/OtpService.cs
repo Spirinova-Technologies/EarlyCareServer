@@ -34,10 +34,9 @@ namespace EarlyCare.Core.Services
             //save otp into database
             var otpDetails = new OtpDetails
             {
-                Mobile = mobileNumber,
+                MobileNumber = mobileNumber,
                 IsVerified = false,
                 Otp = otp.ToString(),
-                Type = 1
             };
 
             await _otpRepository.InsertOtpDetails(otpDetails);

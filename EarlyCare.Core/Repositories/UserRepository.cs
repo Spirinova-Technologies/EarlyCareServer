@@ -1,6 +1,6 @@
-﻿using EarlyCare.Core.Interfaces;
+﻿using Dapper;
+using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
-using Dapper;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<User> GetUserByPhoneNumber(string phoneNumber)
         {
-            var query = @"SELECT * FROM users WHERE mobile=@phoneNumber";
+            var query = @"SELECT * FROM User WHERE MobileNumber=@phoneNumber";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -30,7 +30,7 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<List<User>> GetVolunteers()
         {
-            var query = @"SELECT * FROM User where UserType = 1 OR  UserType = 2";
+            var query = @"SELECT * FROM User where  UserType = 2";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -54,9 +54,11 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<User> InsertUser(User user)
         {
-            var query = @"Insert into users (fullName, email, password, mobile, otp, isVerify, profilePhoto, loginType, accessToken, socialId, role, address, isActive, created, modified)
-                          Values(@fullName, @email, @password, @mobile, @otp, @isVerify, @profilePhoto, @loginType, @accessToken, @socialId, @role, @address,
-                             @isActive, @created, @modified)";
+            var query = @"Insert into User (FullName, Email, Password, MobileNumber,  CityId, IsVerified, ProfilePhoto, UserType, socialId, IsActive,  created, modified)
+                          Values(@fullName, @email, @password, @mobile, @cityId,  @isVerify, @profilePhoto, @userType, @socialId,
+                             @isActive, @created, @modified);
+
+                        SELECT * FROM User where id =(select LAST_INSERT_ID());";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -65,15 +67,12 @@ namespace EarlyCare.Core.Repositories
                     fullName = user.FullName,
                     email = user.Email,
                     password = user.Password,
-                    mobile = user.Mobile,
-                    otp = user.Otp,
+                    mobile = user.MobileNumber,
+                    cityId = user.CityId,
                     isVerify = user.IsVerified,
+                    userType = user.UserType,
                     profilePhoto = user.ProfilePhoto,
-                    loginType = 1,
-                    accessToken = user.AccessToken,
-                    socialId = user.SocialId,
-                    role = user.Role,
-                    address = user.Address,
+                    socialId = "",
                     isActive = 1,
                     created = DateTime.Now,
                     modified = DateTime.Now
@@ -82,5 +81,44 @@ namespace EarlyCare.Core.Repositories
                 return result.FirstOrDefault();
             }
         }
+
+        public async Task<bool> IsEmailIdExists(string emailId)
+        {
+            var query = @"SELECT * FROM User WHERE Email=@emailId";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<User>(query, new { emailId });
+
+                return result.FirstOrDefault() != null;
+            }
+        }
+
+        public async Task InsertUserServiceData(UserServiceData userServiceData)
+        {
+            var query = @"Insert into UserServiceMapping (UserId, ServiceId)
+                          Values(@userId, @serviceId)";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query, new { userId = userServiceData.UserId, serviceId = userServiceData.ServiceId });
+            }
+        }
+
+        public async Task<List<Service>> GetUsersServices(int userId)
+        {
+            var query = @"SELECT s.* FROM CovidTracker.UserServiceMapping usc 
+                            join Services s on s.Id = usc.ServiceId
+                            join User u on u.Id = usc.UserId
+                            where u.Id = @userId order by id ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<Service>(query, new { userId });
+
+                return result.ToList();
+            }
+        }
+
     }
 }

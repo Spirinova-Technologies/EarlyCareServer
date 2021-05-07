@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EarlyCare.WebApi.AutoMapperConfiguration
 {
@@ -15,7 +12,9 @@ namespace EarlyCare.WebApi.AutoMapperConfiguration
             CreateMap<CreateUserRequestModel, User>()
                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<User, UserResponseModel>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+              .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<GoogleSheet, GoogleSheetResponse>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

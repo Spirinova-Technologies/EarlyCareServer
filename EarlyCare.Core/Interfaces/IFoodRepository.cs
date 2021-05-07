@@ -11,5 +11,6 @@ namespace EarlyCare.Core.Interfaces
         Task<Food> InsertFood(Food plasma);
         Task<Food> UpdateFood(Food plasma);
         Task<Food> GetFoodByName(string name);
+        Task<Food> GetFoodByUserId(int userId);
     }
 }

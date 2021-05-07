@@ -1,5 +1,6 @@
 ﻿using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.SharedModels;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
@@ -48,52 +49,49 @@ namespace EarlyCare.Core.Services
             _drugsRepository = drugsRepository;
         }
 
-        public async Task<bool> GetGoogleSheetData()
+        public async Task<bool> GetGoogleSheetData(GoogleSheetRequestModel googleSheetRequestModel)
         {
-            var sheets = await _googleSheetRepository.GetGoogleSheets();
+            var sheet = await _googleSheetRepository.GetGoogleSheetByName(googleSheetRequestModel.SheetName);
 
             var cities = await _hospitalRepository.GetCities();
 
-            foreach (var sheet in sheets)
+            IList<IList<object>> values = GetSheetData(sheet.Name.ToString(), sheet.ToRange, "");
+
+            if (values == null || values.Count == 0)
+                return true;
+
+            switch (sheet.Name)
             {
-                IList<IList<object>> values = GetSheetData(sheet.Name.ToString(), sheet.ToRange, "");
+                case GoogleSheetNames.AmbulanceProvider:
+                    await ProcessAmbulanceRecordsAsync(values, cities);
+                    break;
 
-                if (values == null || values.Count == 0)
-                    continue;
+                case GoogleSheetNames.COVIDConsultancyDoc:
+                    await ProcessConsultationRecordsAsync(values, cities);
+                    break;
 
-                switch (sheet.Name)
-                {
-                    case GoogleSheetNames.AmbulanceProvider:
-                        await ProcessAmbulanceRecordsAsync(values, cities);
-                        break;
+                case GoogleSheetNames.FoodPackets:
+                    await ProcessFoodRecordsAsync(values, cities);
+                    break;
 
-                    case GoogleSheetNames.COVIDConsultancyDoc:
-                        await ProcessConsultationRecordsAsync(values, cities);
-                        break;
+                case GoogleSheetNames.HospitalsBeds:
+                    await ProcessHospitalRecordsAsync(values, cities);
+                    break;
 
-                    case GoogleSheetNames.FoodPackets:
-                        await ProcessFoodRecordsAsync(values, cities);
-                        break;
+                case GoogleSheetNames.MedicalEquipment:
+                    break;
 
-                    case GoogleSheetNames.HospitalsBeds:
-                        await ProcessHospitalRecordsAsync(values, cities);
-                        break;
+                case GoogleSheetNames.OxygenProvider:
+                    await ProcessOxyegnProviderRecordsAsync(values, cities);
+                    break;
 
-                    case GoogleSheetNames.MedicalEquipment:
-                        break;
+                case GoogleSheetNames.PlasmaDonors:
+                    await ProcessPlasmaDonorRecordsAsync(values, cities);
+                    break;
 
-                    case GoogleSheetNames.OxygenProvider:
-                        await ProcessOxyegnProviderRecordsAsync(values, cities);
-                        break;
-
-                    case GoogleSheetNames.PlasmaDonors:
-                        await ProcessPlasmaDonorRecordsAsync(values, cities);
-                        break;
-
-                    case GoogleSheetNames.Remdesivir:
-                        await ProcessDrugsRecordsAsync(values, cities);
-                        break;
-                }
+                case GoogleSheetNames.Remdesivir:
+                    await ProcessDrugsRecordsAsync(values, cities);
+                    break;
             }
 
             return true;

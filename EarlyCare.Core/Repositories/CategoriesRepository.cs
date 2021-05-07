@@ -29,6 +29,17 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
+        public async Task<List<Service>> GetServices()
+        {
+            var query = @"SELECT * FROM Services";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<Service>(query);
+
+                return result.ToList();
+            }
+        }
 
     }
 }
