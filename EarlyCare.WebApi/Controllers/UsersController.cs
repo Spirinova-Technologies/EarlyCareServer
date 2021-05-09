@@ -85,6 +85,32 @@ namespace EarlyCare.WebApi.Controllers
             return Ok(new BaseResponseModel { Status = 1, Message = "User crated successfully", Result = response });
         }
 
+        [HttpPost("updateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestModel userRequestModel)
+        {
+            var user = await _userRepository.GetUserById(userRequestModel.Id);
+
+            user.FullName = userRequestModel.FullName;
+            user.UserType = userRequestModel.UserType;
+
+            var insertedUser = await _userRepository.UpdateUser(user);
+
+            //delete all the user service mapping
+            await _userRepository.DeleteUserServiceMapping(userRequestModel.Id);
+
+            //insert the User service mapping
+            foreach (var service in userRequestModel.Services)
+            {
+                await _userRepository.InsertUserServiceData(new UserServiceData { ServiceId = service, UserId = insertedUser.Id });
+            }
+
+            var userServices = await _userRepository.GetUsersServices(insertedUser.Id);
+            var response = _userService.GenerateUserResponse(insertedUser, userServices);
+
+            return Ok(new BaseResponseModel { Status = 1, Message = "User updated successfully", Result = response });
+        }
+
+
         [HttpGet("getVolunteers")]
         public async Task<IActionResult> GetVolunteers()
         {
@@ -101,6 +127,16 @@ namespace EarlyCare.WebApi.Controllers
             return Ok(response);
         }
 
+        [HttpGet("getUserById")]
+        public async Task<IActionResult> GetUserById([Required] int userId)
+        {
+            var user = await _userRepository.GetUserById(userId);
+
+            var userServices = await _userRepository.GetUsersServices(user.Id);
+            var response = _userService.GenerateUserResponse(user, userServices);
+
+            return Ok(new BaseResponseModel { Status = 1, Message = "User crated successfully", Result = response });
+        }
 
         [NonAction]
         private async Task<IActionResult> PrepareResponse(bool isNewUser, OtpDetails otpDetails, VerifyOTPRequestModel verifyOTPRequestModel, UserResponseModel userResponseModel = null)

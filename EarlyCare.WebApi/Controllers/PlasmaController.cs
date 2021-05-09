@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,9 +30,9 @@ namespace EarlyCare.WebApi.Controllers
         }
 
         [HttpGet("getPlasmas")]
-        public async Task<IActionResult> GetPlasmas([Required] int cityId)
+        public async Task<IActionResult> GetPlasmas([Required] int cityId, int? userType)
         {
-            var response = await _plasmaRepository.GetPlasmas(cityId);
+            var response = await _plasmaRepository.GetPlasmas(cityId, userType);
 
             return Ok(response);
         }
@@ -80,7 +81,7 @@ namespace EarlyCare.WebApi.Controllers
                 CityId = plasmaRequestModel.CityId,
                 Address = plasmaRequestModel.Address,
                 BloodGroup = plasmaRequestModel.BloodGroup,
-                CovidNegativeDate = plasmaRequestModel.CovidNegativeDate.HasValue ? ConvertToISTDateTime(plasmaRequestModel.CovidNegativeDate.Value): default,
+                CovidNegativeDate = plasmaRequestModel.CovidNegativeDate.HasValue ? ConvertToISTDateTime(plasmaRequestModel.CovidNegativeDate.Value) : default,
                 CovidPositiveDate = plasmaRequestModel.CovidPositiveDate.HasValue ? ConvertToISTDateTime(plasmaRequestModel.CovidPositiveDate.Value) : default,
                 DonorType = plasmaRequestModel.DonorType,
                 IsVerified = false,
@@ -97,6 +98,15 @@ namespace EarlyCare.WebApi.Controllers
             return Ok(new BaseResponseModel { Message = "Data updated successfully", Result = response, Status = 1 });
         }
 
+        [HttpPost("updateVerificationStatus")]
+        public async Task<IActionResult> UpdateVerificationStatus([FromBody] UpdateVerificationStatusModel plasmaRequestModel)
+        {
+            await _plasmaRepository.UpdateVerificationStatus(plasmaRequestModel);
+
+            return Ok(new BaseResponseModel { Message = "Status updated successfully",  Status = 1 });
+        }
+
+        [NonAction]
         private DateTime ConvertToISTDateTime(DateTime utcdate)
         {
             return TimeZoneInfo.ConvertTimeFromUtc(utcdate, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));

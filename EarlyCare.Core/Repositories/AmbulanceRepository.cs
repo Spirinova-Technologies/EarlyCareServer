@@ -29,6 +29,16 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
+        public async Task DeleteSyncedAmbulanceDetails()
+        {
+            var query = @"Delete from Ambulance where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<List<AmbulanceResponseModel>> GetAmbulances(int cityId)
         {
             var query = @"select a.Id, a.Name,a.Address,a.Area,a.PhoneNumber,
@@ -53,8 +63,8 @@ namespace EarlyCare.Core.Repositories
             try
             {
                 var query = @"INSERT into Ambulance (Name, Address, Area, PhoneNumber, AmbulanceType, NumberOfAmbulances, ProviderType,  IsVerified, CreatedOn, UpdatedOn,
-                             CreatedBy, UpdatedBy,  CityId )
-                          Values (@name,@address, @area, @phoneNumber, @ambulanceType, @numberOfAmbulances, @providerType, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @cityId)";
+                             CreatedBy, UpdatedBy,  CityId, IsSynced )
+                          Values (@name,@address, @area, @phoneNumber, @ambulanceType, @numberOfAmbulances, @providerType, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @cityId, @isSynced)";
 
                 using (IDbConnection connection = await OpenConnectionAsync())
                 {
@@ -70,9 +80,10 @@ namespace EarlyCare.Core.Repositories
                         isVerified = ambulance.IsVerified,
                         createdOn = DateTime.Now,
                         updatedOn = DateTime.Now,
-                        createdBy = 0,
-                        updatedBy = 0,
-                        cityId = ambulance.CityId
+                        createdBy = ambulance.CreatedBy,
+                        updatedBy = ambulance.UpdatedBy,
+                        cityId = ambulance.CityId,
+                        isSynced= ambulance.IsSynced
                     });
 
                     return result.FirstOrDefault();

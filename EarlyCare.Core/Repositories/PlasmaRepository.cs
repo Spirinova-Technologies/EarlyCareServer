@@ -17,14 +17,47 @@ namespace EarlyCare.Core.Repositories
         public PlasmaRepository(IConfiguration configuration) : base(configuration)
         {
         }
-
-        public async Task<List<PlasmaResponseModel>> GetPlasmas(int cityId)
+        public async Task DeleteSyncedPlasmaDonorDetails()
         {
-            var query = @"select p.Id, p.Name,p.Address,p.BloodGroup,p.PhoneNumber,p.IsRtpcrReportAvailable,p.IsAntibodyReportAvailable, p.BloodGroup,
-                          p.CovidPositiveDate, p.CovidNegativeDate, p.UpdatedOn, u.FullName as UpdatedBy, p.DonorType,  c.Name as City from PlasmaDonor p
+            var query = @"Delete from PlasmaDonor where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
+        public async Task UpdateVerificationStatus(UpdateVerificationStatusModel plasmaStatusModel)
+        {
+            var query = @"Update PlasmaDonor set IsVerified = @IsVerified,  UpdatedBy= @updatedBy, UpdatedOn =@updatedOn where id = @id ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query, new
+                {
+                    id = plasmaStatusModel.Id,
+                    isVerified = plasmaStatusModel.MarkVerified,
+                    updatedBy = plasmaStatusModel.UserId,
+                    updatedOn = DateTime.Now
+                });
+            }
+        }
+
+
+        public async Task<List<PlasmaResponseModel>> GetPlasmas(int cityId, int? userType)
+        {
+            string whereClause = string.Empty;
+            if (!userType.HasValue || userType.Value != 2)
+            {
+                whereClause = " and p.IsVerified = 1";
+            }
+
+            var query = $@"select p.Id, p.Name,p.Address,p.BloodGroup,p.PhoneNumber,p.IsRtpcrReportAvailable,p.IsAntibodyReportAvailable, p.BloodGroup,
+                          p.CovidPositiveDate, p.CovidNegativeDate, p.UpdatedOn, u.FullName as UpdatedBy, p.DonorType, p.IsSynced,  p.IsVerified, c.Name as City from PlasmaDonor p
                           join User u on u.id = p.UpdatedBy
                           join Cities c on c.id = p.CityId
-                          where p.CityId = @cityId and p.IsVerified = 1";
+                          where p.CityId = @cityId {whereClause}";
+
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -71,9 +104,9 @@ namespace EarlyCare.Core.Repositories
             try
             {
                 var query = @"INSERT into PlasmaDonor (Name, Address, BloodGroup, PhoneNumber, IsRtpcrReportAvailable, IsAntibodyReportAvailable, CovidPositiveDate,
-                            CovidNegativeDate, IsVerified, CreatedOn, UpdatedOn, CreatedBy, UpdatedBy, DonorType, CityId )
+                            CovidNegativeDate, IsVerified, CreatedOn, UpdatedOn, CreatedBy, UpdatedBy, DonorType, CityId , IsSynced)
                           Values (@name, @address, @bloodGroup, @phoneNumber, @isRtpcrReportAvailable, @isAntibodyReportAvailable, @covidPositiveDate,
-                            @covidNegativeDate, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @donorType, @cityId);
+                            @covidNegativeDate, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @donorType, @cityId, @isSynced);
 
                             Select * FROM PlasmaDonor where id =(select LAST_INSERT_ID());";
 
@@ -95,13 +128,14 @@ namespace EarlyCare.Core.Repositories
                         createdBy = plasma.CreatedBy,
                         updatedBy = plasma.UpdatedBy,
                         donorType = plasma.DonorType,
-                        cityId = plasma.CityId
+                        cityId = plasma.CityId,
+                        isSynced = plasma.IsSynced
                     });
 
                     return result.FirstOrDefault();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -141,7 +175,7 @@ namespace EarlyCare.Core.Repositories
                     return result.FirstOrDefault();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }

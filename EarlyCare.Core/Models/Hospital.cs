@@ -33,5 +33,6 @@ namespace EarlyCare.Core.Models
         public bool IsAvailableICUVentilator { get; set; }
         public bool IsAvailableICU { get; set; }
         public bool IsAvailableOxygen { get; set; }
+        public bool IsSynced { get; set; }
     }
 }

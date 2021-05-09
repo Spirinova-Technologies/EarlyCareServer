@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EarlyCare.Core.Repositories
@@ -16,6 +15,33 @@ namespace EarlyCare.Core.Repositories
     {
         public OxygenProviderRepository(IConfiguration configuration) : base(configuration)
         {
+        }
+
+        public async Task UpdateVerificationStatus(UpdateVerificationStatusModel statusModel)
+        {
+            var query = @"Update OxygenProvider set IsVerified = @IsVerified,  UpdatedBy= @updatedBy,
+                           UpdatedOn =@updatedOn where id = @id ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query, new
+                {
+                    id = statusModel.Id,
+                    isVerified = statusModel.MarkVerified,
+                    updatedBy = statusModel.UserId,
+                    updatedOn = DateTime.Now
+                });
+            }
+        }
+
+        public async Task DeleteSyncedOxygenProviderDetails()
+        {
+            var query = @"Delete from OxygenProvider where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
         }
 
         public async Task<OxygenProvider> GetOxygenProviderByName(string name)
@@ -42,14 +68,20 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
-        public async Task<List<OxygenProviderResponseModel>> GetOxygenProviders(int cityId)
+        public async Task<List<OxygenProviderResponseModel>> GetOxygenProviders(int cityId, int? userType)
         {
-            var query = @"select o.Id, o.Name,o.Area,o.PhoneNumber, o.Charges, o.GovRegistraionNumber, 
-	                        o.UpdatedOn,  u.FullName as UpdatedBy,  o.Type,
+            string whereClause = string.Empty;
+            if (!userType.HasValue || userType.Value != 2)
+            {
+                whereClause = " and o.IsVerified = 1";
+            }
+
+            var query = $@"select o.Id, o.Name,o.Area,o.PhoneNumber, o.Charges, o.GovRegistraionNumber,
+	                        o.UpdatedOn,  u.FullName as UpdatedBy,  o.Type, o.IsSynced, o.isVerified,
                             c.Name as City from OxygenProvider o
 	                        join User u on u.id = o.UpdatedBy
 	                        join Cities c on c.id = o.CityId
-                            where o.CityId = @cityId and o.IsVerified = 1";
+                            where o.CityId = @cityId {whereClause}";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -67,8 +99,8 @@ namespace EarlyCare.Core.Repositories
             try
             {
                 var query = @"INSERT into OxygenProvider (Name, Area, PhoneNumber, Charges, GovRegistraionNumber, IsVerified, CreatedOn, UpdatedOn,
-                             CreatedBy, UpdatedBy, Type, CityId )
-                          Values (@name, @area, @phoneNumber, @charges, @govRegistraionNumber, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @type, @cityId);
+                             CreatedBy, UpdatedBy, Type, CityId, IsSynced )
+                          Values (@name, @area, @phoneNumber, @charges, @govRegistraionNumber, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @type, @cityId, @isSynced);
 
                             Select * FROM OxygenProvider where id =(select LAST_INSERT_ID());";
 
@@ -85,9 +117,10 @@ namespace EarlyCare.Core.Repositories
                         createdOn = DateTime.Now,
                         updatedOn = DateTime.Now,
                         createdBy = oxygenProvider.CreatedBy,
-                        updatedBy = oxygenProvider.UpdatedOn,
+                        updatedBy = oxygenProvider.UpdatedBy,
                         type = oxygenProvider.Type,
-                        cityId = oxygenProvider.CityId
+                        cityId = oxygenProvider.CityId,
+                        isSynced = oxygenProvider.IsSynced
                     });
 
                     return result.FirstOrDefault();
@@ -103,8 +136,8 @@ namespace EarlyCare.Core.Repositories
         {
             try
             {
-                var query = @"Update OxygenProvider set Name =@name, Area = @area, PhoneNumber = @phoneNumber, Charges =@charges, GovRegistraionNumber = @govRegistraionNumber, 
-                                IsVerified = @isVerified, UpdatedOn=@updatedOn,  UpdatedBy= @updatedBy, Type= @type, CityId= @cityId 
+                var query = @"Update OxygenProvider set Name =@name, Area = @area, PhoneNumber = @phoneNumber, Charges =@charges, GovRegistraionNumber = @govRegistraionNumber,
+                                IsVerified = @isVerified, UpdatedOn=@updatedOn,  UpdatedBy= @updatedBy, Type= @type, CityId= @cityId
                              where Id = @id;
 
                            Select * FROM OxygenProvider where id =@id";

@@ -28,6 +28,18 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
+        public async Task<User> GetUserById(int userId)
+        {
+            var query = @"SELECT * FROM User WHERE Id=@userId";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<User>(query, new { userId });
+
+                return result.FirstOrDefault();
+            }
+        }
+
         public async Task<List<User>> GetVolunteers()
         {
             var query = @"SELECT * FROM User where  UserType = 2";
@@ -65,7 +77,7 @@ namespace EarlyCare.Core.Repositories
                 var result = await connection.QueryAsync<User>(query, new
                 {
                     fullName = user.FullName,
-                    email = user.Email,
+                    email = user.Email.ToLower(),
                     password = user.Password,
                     mobile = user.MobileNumber,
                     cityId = user.CityId,
@@ -76,6 +88,26 @@ namespace EarlyCare.Core.Repositories
                     isActive = 1,
                     created = DateTime.Now,
                     modified = DateTime.Now
+                });
+
+                return result.FirstOrDefault();
+            }
+        }
+
+        public async Task<User> UpdateUser(User user)
+        {
+            var query = @"Update User set FullName =@name, UserType = @userType
+                             where Id = @id;
+
+                           Select * FROM User where id =@id";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<User>(query, new
+                {
+                    id = user.Id,
+                    name = user.FullName,
+                    userType = user.UserType,
                 });
 
                 return result.FirstOrDefault();
@@ -107,7 +139,7 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<List<Service>> GetUsersServices(int userId)
         {
-            var query = @"SELECT s.* FROM CovidTracker.UserServiceMapping usc 
+            var query = @"SELECT s.* FROM UserServiceMapping usc 
                             join Services s on s.Id = usc.ServiceId
                             join User u on u.Id = usc.UserId
                             where u.Id = @userId order by id ";
@@ -120,5 +152,16 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
+        public async Task DeleteUserServiceMapping(int userId)
+        {
+            var query = @"delete from UserServiceMapping
+                            where UserId = @userId ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync(query, new { userId });
+
+            }
+        }
     }
 }

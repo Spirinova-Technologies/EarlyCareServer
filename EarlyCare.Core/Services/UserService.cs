@@ -74,5 +74,7 @@ namespace EarlyCare.Core.Services
 
             return await _userRepository.InsertUser(user);
         }
+
+     
     }
 }

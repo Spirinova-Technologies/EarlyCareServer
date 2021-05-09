@@ -7,5 +7,6 @@ namespace EarlyCare.Core.Interfaces
     public interface IRtpcrTestRepository
     {
         Task<List<RtpcrTest>> GetRtpcrTests(int cityId);
+        Task DeleteSyncedRTPCRTestDetails();
     }
 }

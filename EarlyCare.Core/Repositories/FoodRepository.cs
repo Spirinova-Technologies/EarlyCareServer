@@ -18,6 +18,32 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
+        public async Task UpdateVerificationStatus(UpdateVerificationStatusModel statusModel)
+        {
+            var query = @"Update Food set IsVerified = @IsVerified,  UpdatedBy= @updatedBy, UpdatedOn =@updatedOn where id = @id ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query, new
+                {
+                    id = statusModel.Id,
+                    isVerified = statusModel.MarkVerified,
+                    updatedBy = statusModel.UserId,
+                    updatedOn = DateTime.Now
+                });
+            }
+        }
+
+        public async Task DeleteSyncedFoodDetails()
+        {
+            var query = @"Delete from Food where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<Food> GetFoodByName(string name)
         {
             var query = @"SELECT * from Food where TRIM(Name) = @name ";
@@ -42,14 +68,20 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
-        public async Task<List<FoodResponseModel>> GetFoods(int cityId)
+        public async Task<List<FoodResponseModel>> GetFoods(int cityId, int? userType)
         {
-            var query = @"select f.Id, f.Name,f.Address,f.Area,f.PhoneNumber,f.RegistrationNumber,f.Charges, f.Delivery, f.FoodServed, f.Type, f.IsVerified,
+            string whereClause = string.Empty;
+            if (!userType.HasValue || userType.Value != 2)
+            {
+                whereClause = " and f.IsVerified = 1";
+            }
+
+            var query = $@"select f.Id, f.Name,f.Address,f.Area,f.PhoneNumber,f.RegistrationNumber,f.Charges, f.Delivery, f.FoodServed, f.Type, f.IsVerified, f.IsSynced,
                             f.UpdatedOn,  u.FullName as UpdatedBy, 
                             c.Name as City from Food f
 						    join User u on u.id = f.UpdatedBy
                             join Cities c on c.id = f.CityId
-                            where f.CityId = @cityId and f.IsVerified = 1";
+                            where f.CityId = @cityId {whereClause}";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -67,9 +99,9 @@ namespace EarlyCare.Core.Repositories
             try
             {
                 var query = @"INSERT into Food (Name, Address, Area, PhoneNumber, Charges, RegistrationNumber, Delivery, FoodServed,  IsVerified, CreatedOn, UpdatedOn,
-                             CreatedBy, UpdatedBy, Type, CityId )
+                             CreatedBy, UpdatedBy, Type, CityId, IsSynced )
                           Values (@name,@address, @area, @phoneNumber, @charges, @registrationNumber, @delivery, @foodServed, @isVerified, @createdOn,@updatedOn, 
-                             @createdBy, @updatedBy,  @type, @cityId);
+                             @createdBy, @updatedBy,  @type, @cityId, @isSynced);
 
                           Select * FROM Food where id =(select LAST_INSERT_ID());";
 
@@ -91,7 +123,8 @@ namespace EarlyCare.Core.Repositories
                         createdBy = food.CreatedBy,
                         updatedBy = food.UpdatedBy,
                         type = food.Type,
-                        cityId = food.CityId
+                        cityId = food.CityId,
+                        isSynced = food.IsSynced
                     });
 
                     return result.FirstOrDefault();

@@ -18,5 +18,6 @@ namespace EarlyCare.Core.Interfaces
         Task<Hospital> InsertHospital(Hospital hospital);
 
         Task<Hospital> UpdateHospital(Hospital hospital);
+        Task DeleteSyncedHospitalsDetails();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,9 +25,9 @@ namespace EarlyCare.WebApi.Controllers
         }
 
         [HttpGet("getOxygenProviders")]
-        public async Task<IActionResult> GetOxygenProviders([Required] int cityId)
+        public async Task<IActionResult> GetOxygenProviders([Required] int cityId, int? userType)
         {
-            var response = await _oxygenProviderRepository.GetOxygenProviders(cityId);
+            var response = await _oxygenProviderRepository.GetOxygenProviders(cityId, userType);
 
             return Ok(response);
         }
@@ -38,6 +39,15 @@ namespace EarlyCare.WebApi.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("updateVerificationStatus")]
+        public async Task<IActionResult> UpdateVerificationStatus([FromBody] UpdateVerificationStatusModel updateRequestModel)
+        {
+            await _oxygenProviderRepository.UpdateVerificationStatus(updateRequestModel);
+
+            return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
+        }
+
 
         [HttpPost("insertOxygenDetails")]
         public async Task<IActionResult> InsertOxygenDetails([FromBody] OxygenDetailsRequestModel oxygenDetailsRequestModel)

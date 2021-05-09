@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,9 +30,9 @@ namespace EarlyCare.WebApi.Controllers
         }
 
         [HttpGet("getFoods")]
-        public async Task<IActionResult> GetFoods([Required] int cityId)
+        public async Task<IActionResult> GetFoods([Required] int cityId, int? userType)
         {
-            var response = await _foodRepository.GetFoods(cityId);
+            var response = await _foodRepository.GetFoods(cityId, userType);
 
             return Ok(response);
         }
@@ -95,6 +96,14 @@ namespace EarlyCare.WebApi.Controllers
             var response = await _foodRepository.UpdateFood(oxygenProvider);
 
             return Ok(new BaseResponseModel { Message = "Data updated successfully", Result = response, Status = 1 });
+        }
+
+        [HttpPost("updateVerificationStatus")]
+        public async Task<IActionResult> UpdateVerificationStatus([FromBody] UpdateVerificationStatusModel statusRequestModel)
+        {
+            await _foodRepository.UpdateVerificationStatus(statusRequestModel);
+
+            return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
         }
     }
 }

@@ -11,5 +11,6 @@ namespace EarlyCare.Core.Interfaces
         Task<Ambulance> InsertAmbulance(Ambulance ambulance);
         Task<Ambulance> UpdateAmbulance(Ambulance ambulance);
         Task<Ambulance> GetAmbulanceDetails(string name, string phoneNumber);
+        Task DeleteSyncedAmbulanceDetails();
     }
 }

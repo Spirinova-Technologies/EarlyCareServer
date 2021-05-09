@@ -13,5 +13,8 @@ namespace EarlyCare.Core.Interfaces
         Task<bool> IsEmailIdExists(string emailId);
         Task InsertUserServiceData(UserServiceData userServiceData);
         Task<List<Service>> GetUsersServices(int userId);
+        Task<User> GetUserById(int userId);
+        Task<User> UpdateUser(User user);
+        Task DeleteUserServiceMapping(int userId);
     }
 }

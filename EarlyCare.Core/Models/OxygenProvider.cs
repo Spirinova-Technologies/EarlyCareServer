@@ -17,5 +17,6 @@ namespace EarlyCare.Core.Models
         public int CreatedBy { get; set; }
         public int UpdatedBy { get; set; }
         public int CityId { get; set; }
+        public bool IsSynced { get; set; }
     }
 }

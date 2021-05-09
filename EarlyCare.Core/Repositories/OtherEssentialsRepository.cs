@@ -15,6 +15,16 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
+        public async Task DeleteSyncedOtherEssentialsDetails()
+        {
+            var query = @"Delete from OtherEssentials where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<List<OtherEssentialsResponseModel>> GetOtherEssentials(int cityId)
         {
             var query = @"select *, u.FullName as UpdatedBy from OtherEssentials o

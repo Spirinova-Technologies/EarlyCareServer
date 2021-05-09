@@ -14,6 +14,7 @@ namespace EarlyCare.Core.Models
         public string ProviderType { get; set; }
         public int CityId { get; set; }
         public bool IsVerified { get; set; }
+        public bool IsSynced { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
         public int CreatedBy { get; set; }

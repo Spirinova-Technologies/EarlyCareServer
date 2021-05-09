@@ -8,9 +8,13 @@ namespace EarlyCare.Core.Interfaces
     public interface IUserService
     {
         Task<User> GetUserByPhoneNumber(string phoneNumber);
+
         Task<User> InsertUser(User user);
+
         Task<List<User>> GetVolunteers();
+
         Task<User> GetVolunteer(int volunteerId);
+
         UserResponseModel GenerateUserResponse(User user, List<Service> services);
     }
 }

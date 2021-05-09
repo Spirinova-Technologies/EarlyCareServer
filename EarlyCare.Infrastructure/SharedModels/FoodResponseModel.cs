@@ -18,5 +18,6 @@ namespace EarlyCare.Infrastructure.SharedModels
         public string UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
         public string City { get; set; }
+        public bool IsSynced { get; set; }
     }
 }

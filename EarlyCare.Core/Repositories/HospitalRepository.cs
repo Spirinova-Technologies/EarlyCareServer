@@ -17,6 +17,16 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
+        public async Task DeleteSyncedHospitalsDetails()
+        {
+            var query = @"Delete from Hospitals where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<BedCountDetails> GetBedCounts(int cityId)
         {
             var query = @"SELECT SUM(VacantIsolation) AS VacantIsolationBeds , SUM(VacantWithOxygen) AS VacantWithOxygenBeds
@@ -64,10 +74,10 @@ namespace EarlyCare.Core.Repositories
         {
             var query = @"INSERT INTO  Hospitals(Name,Address,Latitude,Longitude,CityId,PhoneNumber1,PhoneNumber2,
                           PhoneNumber3,PhoneNumber4, CreatedAt, ModifiedAt, CreatedBy, UpdatedBy, HospitalType, IsAvailableIsolationBed,
-                          IsAvailableICUVentilator, IsAvailableICU, IsAvailableOxygen)
+                          IsAvailableICUVentilator, IsAvailableICU, IsAvailableOxygen, IsSynced )
                         VALUES(@name,@address,@latitude,@longitude,@cityId,@phoneNumber1,@phoneNumber2,
                           @phoneNumber3,@phoneNumber4, @createdAt, @modifiedAt, @createdBy, @updatedBy, @hospitalType, @isAvailableIsolationBed,
-                          @isAvailableICUVentilator, @isAvailableICU, @isAvailableOxygen)";
+                          @isAvailableICUVentilator, @isAvailableICU, @isAvailableOxygen, @isSynced)";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -91,6 +101,7 @@ namespace EarlyCare.Core.Repositories
                     isAvailableICUVentilator = hospital.IsAvailableICUVentilator,
                     isAvailableICU = hospital.IsAvailableICU,
                     isAvailableOxygen = hospital.IsAvailableOxygen,
+                    isSynced = hospital.IsSynced
                 });
 
                 return result.FirstOrDefault();

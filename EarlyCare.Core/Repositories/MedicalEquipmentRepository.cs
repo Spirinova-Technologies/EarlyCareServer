@@ -17,6 +17,16 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
+        public async Task DeleteSyncedMedicalEquipmentDetails()
+        {
+            var query = @"Delete from MedicalEquipment where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<List<MedicalEquipmentResponse>> GetMedicalEquipments(int cityId)
         {
             var query = @"select me.Id, me.Name,me.Address,me.Area,me.PhoneNumber,

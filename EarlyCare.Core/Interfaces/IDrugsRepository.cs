@@ -11,5 +11,6 @@ namespace EarlyCare.Core.Interfaces
         Task<Drug> InsertDrugs(Drug  drug);
         Task<Drug> UpdateDrugs(Drug  drug);
         Task<Drug> GetDrugDetails(string name);
+        Task DeleteSyncedDrugsDetails();
     }
 }

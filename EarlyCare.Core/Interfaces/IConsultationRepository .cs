@@ -11,5 +11,6 @@ namespace EarlyCare.Core.Interfaces
         Task<Consultation> InsertConsultation(Consultation consultation);
         Task<Consultation> UpdateConsultation(Consultation consultation);
         Task<Consultation> GetConsultationDetails(string name);
+        Task DeleteSyncedConsultationDetails();
     }
 }

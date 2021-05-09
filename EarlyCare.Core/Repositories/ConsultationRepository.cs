@@ -17,6 +17,16 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
+        public async Task DeleteSyncedConsultationDetails()
+        {
+            var query = @"Delete from Consultation where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<Consultation> GetConsultationDetails(string name)
         {
             var query = @"SELECT * from Consultation where TRIM(DoctorName) = @name ";
@@ -49,8 +59,9 @@ namespace EarlyCare.Core.Repositories
             try
             {
                 var query = @"INSERT into Consultation (DoctorName, Area, PhoneNumber, Charges, GovRegistraionNumber, Type,  IsVerified, CreatedOn, UpdatedOn,
-                             CreatedBy, UpdatedBy,  CityId )
-                          Values (@name,@area, @phoneNumber, @charges, @govRegistraionNumber, @type, @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @cityId)";
+                             CreatedBy, UpdatedBy,  CityId, IsSynced )
+                          Values (@name,@area, @phoneNumber, @charges, @govRegistraionNumber, @type, @isVerified,
+                                   @createdOn,@updatedOn,  @createdBy, @updatedBy,  @cityId, @isSynced)";
 
                 using (IDbConnection connection = await OpenConnectionAsync())
                 {
@@ -65,9 +76,10 @@ namespace EarlyCare.Core.Repositories
                         isVerified = consultation.IsVerified,
                         createdOn = DateTime.Now,
                         updatedOn = DateTime.Now,
-                        createdBy = 0,
-                        updatedBy = 0,
-                        cityId = consultation.CityId
+                        createdBy = consultation.CreatedBy,
+                        updatedBy = consultation.UpdatedBy,
+                        cityId = consultation.CityId,
+                        isSynced= consultation.IsSynced
                     });
 
                     return result.FirstOrDefault();
@@ -99,8 +111,7 @@ namespace EarlyCare.Core.Repositories
                     isVerified = consultation.IsVerified,
                     createdOn = DateTime.Now,
                     updatedOn = DateTime.Now,
-                    createdBy = 0,
-                    updatedBy = 0,
+                    updatedBy = consultation.UpdatedBy,
                     cityId = consultation.CityId
                 });
 

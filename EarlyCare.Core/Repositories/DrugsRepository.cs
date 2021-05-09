@@ -17,6 +17,16 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
+        public async Task DeleteSyncedDrugsDetails()
+        {
+            var query = @"Delete from Drugs where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<Drug> GetDrugDetails(string name)
         {
             var query = @"SELECT *,  Name as SupplierName from Drugs where TRIM(name) = @name ";
@@ -50,8 +60,8 @@ namespace EarlyCare.Core.Repositories
             try
             {
                 var query = @"INSERT into Drugs (Name, Address, Coordinator, PhoneNumber, GovPhoneNumber,  IsVerified, CreatedOn, UpdatedOn,
-                                CreatedBy, UpdatedBy,  CityId )
-                            Values (@name,@address,@coordinator, @phoneNumber, @govPhoneNumber,  @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @cityId)";
+                                CreatedBy, UpdatedBy,  CityId , IsSynced)
+                            Values (@name,@address,@coordinator, @phoneNumber, @govPhoneNumber,  @isVerified, @createdOn,@updatedOn,  @createdBy, @updatedBy,  @cityId, @isSynced)";
 
                 using (IDbConnection connection = await OpenConnectionAsync())
                 {
@@ -65,9 +75,10 @@ namespace EarlyCare.Core.Repositories
                         isVerified = drug.IsVerified,
                         createdOn = DateTime.Now,
                         updatedOn = DateTime.Now,
-                        createdBy = 0,
-                        updatedBy = 0,
-                        cityId = drug.CityId
+                        createdBy = drug.CreatedBy,
+                        updatedBy = drug.UpdatedBy,
+                        cityId = drug.CityId,
+                        isSynced= drug.IsSynced
                     });
 
                     return result.FirstOrDefault();
@@ -98,9 +109,9 @@ namespace EarlyCare.Core.Repositories
                         govPhoneNumber = drug.GovPhoneNumber,
                         isVerified = drug.IsVerified,
                         updatedOn = DateTime.Now,
-                        createdBy = 0,
-                        updatedBy = 0,
-                        cityId = drug.CityId
+                        updatedBy = drug.UpdatedBy,
+                        cityId = drug.CityId,
+                         isSynced = drug.IsSynced
                     });
 
                     return result.FirstOrDefault();

@@ -17,6 +17,16 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
+        public async Task DeleteSyncedRTPCRTestDetails()
+        {
+            var query = @"Delete from RTPCRTest where IsSynced = true";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                await connection.QueryAsync(query);
+            }
+        }
+
         public async Task<List<RtpcrTest>> GetRtpcrTests(int cityId)
         {
             var query = @"select * from RTPCRTest

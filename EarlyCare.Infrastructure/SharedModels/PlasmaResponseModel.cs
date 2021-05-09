@@ -18,5 +18,14 @@ namespace EarlyCare.Infrastructure.SharedModels
         public DateTime UpdatedOn { get; set; }
         public string DonorType { get; set; }
         public string City { get; set; }
+        public bool IsSynced { get; set; }
     }
+
+    public class UpdateVerificationStatusModel
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public bool MarkVerified { get; set; }
+    }
+
 }
