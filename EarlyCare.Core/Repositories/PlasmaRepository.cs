@@ -1,22 +1,23 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EarlyCare.Core.Repositories
 {
     public class PlasmaRepository : ConnectionRepository, IPlasmaRepository
     {
-        public PlasmaRepository(IConfiguration configuration) : base(configuration)
+        public PlasmaRepository(IConfiguration configuration, IEmailService emailService) : base(configuration)
         {
         }
+
         public async Task DeleteSyncedPlasmaDonorDetails()
         {
             var query = @"Delete from PlasmaDonor where IsSynced = true";
@@ -27,37 +28,39 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
-        public async Task UpdateVerificationStatus(UpdateVerificationStatusModel plasmaStatusModel)
+        public async Task<Plasma> UpdateVerificationStatus(UpdateVerificationStatusModel plasmaStatusModel)
         {
-            var query = @"Update PlasmaDonor set IsVerified = @IsVerified,  UpdatedBy= @updatedBy, UpdatedOn =@updatedOn where id = @id ";
+            var query = @"Update PlasmaDonor set IsVerified = @IsVerified,  UpdatedBy= @updatedBy, UpdatedOn =@updatedOn where id = @id ;
+
+                         Select * from PlasmaDonor where Id = @id ";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
-                await connection.QueryAsync(query, new
+                var response = await connection.QueryAsync<Plasma>(query, new
                 {
                     id = plasmaStatusModel.Id,
                     isVerified = plasmaStatusModel.MarkVerified,
                     updatedBy = plasmaStatusModel.UserId,
                     updatedOn = DateTime.Now
                 });
+                return response.FirstOrDefault();
             }
         }
 
-
-        public async Task<List<PlasmaResponseModel>> GetPlasmas(int cityId, int? userType)
+        public async Task<List<PlasmaResponseModel>> GetPlasmas(int cityId, bool hasApprovePermission)
         {
             string whereClause = string.Empty;
-            if (!userType.HasValue || userType.Value != 2)
+            if (!hasApprovePermission)
             {
                 whereClause = " and p.IsVerified = 1";
             }
 
             var query = $@"select p.Id, p.Name,p.Address,p.BloodGroup,p.PhoneNumber,p.IsRtpcrReportAvailable,p.IsAntibodyReportAvailable, p.BloodGroup,
-                          p.CovidPositiveDate, p.CovidNegativeDate, p.UpdatedOn, u.FullName as UpdatedBy, p.DonorType, p.IsSynced,  p.IsVerified, c.Name as City from PlasmaDonor p
+                          p.CovidPositiveDate, p.CovidNegativeDate, p.UpdatedOn, u.FullName as UpdatedBy, p.DonorType, p.IsSynced,  p.IsVerified, c.Name as City,
+                           {hasApprovePermission} as HasApprovePermission from PlasmaDonor p
                           join User u on u.id = p.UpdatedBy
                           join Cities c on c.id = p.CityId
                           where p.CityId = @cityId {whereClause}";
-
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {

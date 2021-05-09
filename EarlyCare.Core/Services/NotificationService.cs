@@ -1,10 +1,15 @@
-﻿using Amazon.Runtime;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.SimpleEmail;
+using Amazon.SimpleEmail.Model;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using EarlyCare.Core.Interfaces;
+using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -21,9 +26,41 @@ namespace EarlyCare.Core.Services
             _configuration = configuration;
         }
 
-        public bool SendEmail()
+        public async Task<bool> SendEmail(EmailModel emailModel)
         {
-            throw new NotImplementedException();
+            // Change to your region
+            var credentials = new BasicAWSCredentials(_configuration["Aws:AccessKey"], _configuration["Aws:SecretKey"]);
+            using (var client = new AmazonSimpleEmailServiceClient(credentials, Amazon.RegionEndpoint.APSouth1))
+            {
+                var sendRequest = new SendEmailRequest
+                {
+                    Source = emailModel.FromEmail,
+                    Destination = new Destination
+                    {
+                        ToAddresses = emailModel.ToEmailAddresses
+                    },
+                    Message = new Message
+                    {
+                        Subject = new Content(emailModel.Subject),
+                        Body = new Body
+                        {
+                            Html = new Content
+                            {
+                                Charset = "UTF-8",
+                                Data = emailModel.Body
+                            },
+                            Text = new Content
+                            {
+                                Charset = "UTF-8",
+                                Data = emailModel.Body
+                            }
+                        }
+                    }
+                };
+                 await client.SendEmailAsync(sendRequest);
+            }
+
+            return true;
         }
 
         public async Task<bool> SendMessage(string phoneNumber, string message)

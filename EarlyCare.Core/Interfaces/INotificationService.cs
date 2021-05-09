@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using EarlyCare.Infrastructure.SharedModels;
 using System.Threading.Tasks;
 
 namespace EarlyCare.Core.Interfaces
 {
-   public interface INotificationService
+    public interface INotificationService
     {
         Task<bool> SendMessage(string phoneNumber, string message);
-        bool SendEmail();
+
+        Task<bool> SendEmail(EmailModel emailModel);
     }
 }

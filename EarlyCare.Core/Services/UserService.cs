@@ -14,14 +14,16 @@ namespace EarlyCare.Core.Services
         private readonly IUserRepository _userRepository;
         private readonly IGlobalSettingsRepository _globalSettingsRepository;
         private readonly ITokenService _tokenService;
+        private readonly IEmailService _emailService;
 
         public UserService(ILogger<UserService> logger,
-            IUserRepository userRepository, IGlobalSettingsRepository globalSettingsRepository, ITokenService tokenService)
+            IUserRepository userRepository, IGlobalSettingsRepository globalSettingsRepository, ITokenService tokenService, IEmailService emailService)
         {
             _logger = logger;
             _userRepository = userRepository;
             _globalSettingsRepository = globalSettingsRepository;
             _tokenService = tokenService;
+            _emailService = emailService;
         }
 
         public UserResponseModel GenerateUserResponse(User user, List<Service> services)
@@ -47,7 +49,6 @@ namespace EarlyCare.Core.Services
                 Image = p.Image
             }).ToList();
 
-
             return response;
         }
 
@@ -72,9 +73,9 @@ namespace EarlyCare.Core.Services
             user.IsVerified = false;
             user.Password = "";
 
-            return await _userRepository.InsertUser(user);
+            var response = await _userRepository.InsertUser(user);
+            await _emailService.SendNewUserNotification(response);
+            return response;
         }
-
-     
     }
 }

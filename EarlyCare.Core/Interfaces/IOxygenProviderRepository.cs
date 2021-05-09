@@ -7,12 +7,12 @@ namespace EarlyCare.Core.Interfaces
 {
     public interface IOxygenProviderRepository
     {
-        Task<List<OxygenProviderResponseModel>> GetOxygenProviders(int cityId, int? userType);
+        Task<List<OxygenProviderResponseModel>> GetOxygenProviders(int cityId, bool hasApprovePermission);
         Task<OxygenProvider> InsertOxygenProvider(OxygenProvider  oxygenProvider);
         Task<OxygenProvider> UpdateOxygenProvider(OxygenProvider oxygenProvider);
         Task<OxygenProvider> GetOxygenProviderByName(string name);
         Task<OxygenProvider> GetOxygenProviderByUserId(int userId);
         Task DeleteSyncedOxygenProviderDetails();
-        Task UpdateVerificationStatus(UpdateVerificationStatusModel statusModel);
+        Task<OxygenProvider> UpdateVerificationStatus(UpdateVerificationStatusModel statusModel);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,17 +18,26 @@ namespace EarlyCare.WebApi.Controllers
     {
         private readonly IOxygenProviderRepository _oxygenProviderRepository;
         private readonly ILogger<OxygenProviderController> _logger;
+        private readonly IEmailService _emailService;
+        private readonly IUserRepository _userRepository;
 
-        public OxygenProviderController(ILogger<OxygenProviderController> logger, IOxygenProviderRepository oxygenProviderRepository)
+        public OxygenProviderController(ILogger<OxygenProviderController> logger, IOxygenProviderRepository oxygenProviderRepository,
+            IEmailService emailService, IUserRepository userRepository)
         {
             _logger = logger;
+            _emailService = emailService;
             _oxygenProviderRepository = oxygenProviderRepository;
+            _userRepository = userRepository;
         }
 
         [HttpGet("getOxygenProviders")]
-        public async Task<IActionResult> GetOxygenProviders([Required] int cityId, int? userType)
+        public async Task<IActionResult> GetOxygenProviders([Required] int cityId, int? userId)
         {
-            var response = await _oxygenProviderRepository.GetOxygenProviders(cityId, userType);
+            var user = userId.HasValue ? await _userRepository.GetUserById(userId.Value) : null;
+
+            var hasApprovePermission = user != null && (user.UserType == 1 || (user.UserType == 2 && user.IsVerified == true));
+
+            var response = await _oxygenProviderRepository.GetOxygenProviders(cityId, hasApprovePermission);
 
             return Ok(response);
         }
@@ -43,7 +53,10 @@ namespace EarlyCare.WebApi.Controllers
         [HttpPost("updateVerificationStatus")]
         public async Task<IActionResult> UpdateVerificationStatus([FromBody] UpdateVerificationStatusModel updateRequestModel)
         {
-            await _oxygenProviderRepository.UpdateVerificationStatus(updateRequestModel);
+           var response = await _oxygenProviderRepository.UpdateVerificationStatus(updateRequestModel);
+
+            //send email
+            await _emailService.SendUpdateNotification(response.CreatedBy, Constants.OxygenUpdatedEmailSubject, Constants.OxygenDetailsUpdatedEmailBody);
 
             return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
         }

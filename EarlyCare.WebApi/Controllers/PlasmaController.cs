@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Http;
@@ -21,18 +22,25 @@ namespace EarlyCare.WebApi.Controllers
         private readonly IMapper _mapper;
         private readonly IPlasmaRepository _plasmaRepository;
         private readonly ILogger<PlasmaController> _logger;
-
-        public PlasmaController(IMapper mapper, ILogger<PlasmaController> logger, IPlasmaRepository plasmaRepository)
+        private readonly IEmailService _emailService;
+        private readonly IUserRepository _userRepository;
+        public PlasmaController(IMapper mapper, ILogger<PlasmaController> logger, IPlasmaRepository plasmaRepository, IEmailService emailService, IUserRepository userRepository)
         {
             _mapper = mapper;
             _logger = logger;
             _plasmaRepository = plasmaRepository;
+            _emailService = emailService;
+            _userRepository = userRepository;
         }
 
         [HttpGet("getPlasmas")]
-        public async Task<IActionResult> GetPlasmas([Required] int cityId, int? userType)
+        public async Task<IActionResult> GetPlasmas([Required] int cityId, int? userId)
         {
-            var response = await _plasmaRepository.GetPlasmas(cityId, userType);
+            var user = userId.HasValue ? await _userRepository.GetUserById(userId.Value) : null;
+
+            var hasApprovePermission = user != null && (user.UserType == 1 || (user.UserType == 2 && user.IsVerified == true));
+
+            var response = await _plasmaRepository.GetPlasmas(cityId, hasApprovePermission);
 
             return Ok(response);
         }
@@ -101,9 +109,12 @@ namespace EarlyCare.WebApi.Controllers
         [HttpPost("updateVerificationStatus")]
         public async Task<IActionResult> UpdateVerificationStatus([FromBody] UpdateVerificationStatusModel plasmaRequestModel)
         {
-            await _plasmaRepository.UpdateVerificationStatus(plasmaRequestModel);
+            var response = await _plasmaRepository.UpdateVerificationStatus(plasmaRequestModel);
 
-            return Ok(new BaseResponseModel { Message = "Status updated successfully",  Status = 1 });
+            //send email
+            await _emailService.SendUpdateNotification(response.CreatedBy, Constants.PlasmaDetailsUpdatedEmailSubject, Constants.PlasmaDetailsUpdatedEmailBody);
+
+            return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
         }
 
         [NonAction]

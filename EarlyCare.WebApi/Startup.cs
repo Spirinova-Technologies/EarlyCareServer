@@ -39,6 +39,7 @@ namespace EarlyCare.WebApi
             services.AddTransient<IHospitalService, HospitalService>();
             services.AddTransient<IGoogleSheetService, GoogleSheetService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IGlobalSettingsRepository, GlobalSettingsRepository>();
             services.AddTransient<IOtpRepository, OtpRepository>();

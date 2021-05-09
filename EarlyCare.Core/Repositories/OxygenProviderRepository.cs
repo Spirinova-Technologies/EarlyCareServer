@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -17,21 +18,26 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
-        public async Task UpdateVerificationStatus(UpdateVerificationStatusModel statusModel)
+        public async Task<OxygenProvider> UpdateVerificationStatus(UpdateVerificationStatusModel statusModel)
         {
             var query = @"Update OxygenProvider set IsVerified = @IsVerified,  UpdatedBy= @updatedBy,
-                           UpdatedOn =@updatedOn where id = @id ";
+                           UpdatedOn =@updatedOn where Id = @id ;
+
+                           Select * from OxygenProvider where Id = @id";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
-                await connection.QueryAsync(query, new
+              var response = await connection.QueryAsync<OxygenProvider>(query, new
                 {
                     id = statusModel.Id,
                     isVerified = statusModel.MarkVerified,
                     updatedBy = statusModel.UserId,
                     updatedOn = DateTime.Now
                 });
+
+               return response.FirstOrDefault();
             }
+
         }
 
         public async Task DeleteSyncedOxygenProviderDetails()
@@ -68,16 +74,16 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
-        public async Task<List<OxygenProviderResponseModel>> GetOxygenProviders(int cityId, int? userType)
+        public async Task<List<OxygenProviderResponseModel>> GetOxygenProviders(int cityId, bool hasApprovePermission)
         {
             string whereClause = string.Empty;
-            if (!userType.HasValue || userType.Value != 2)
+            if (!hasApprovePermission)
             {
                 whereClause = " and o.IsVerified = 1";
             }
 
             var query = $@"select o.Id, o.Name,o.Area,o.PhoneNumber, o.Charges, o.GovRegistraionNumber,
-	                        o.UpdatedOn,  u.FullName as UpdatedBy,  o.Type, o.IsSynced, o.isVerified,
+	                        o.UpdatedOn,  u.FullName as UpdatedBy,  o.Type, o.IsSynced, o.isVerified, {hasApprovePermission} as HasApprovePermission,
                             c.Name as City from OxygenProvider o
 	                        join User u on u.id = o.UpdatedBy
 	                        join Cities c on c.id = o.CityId

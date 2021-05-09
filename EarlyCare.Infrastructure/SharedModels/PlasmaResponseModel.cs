@@ -19,6 +19,9 @@ namespace EarlyCare.Infrastructure.SharedModels
         public string DonorType { get; set; }
         public string City { get; set; }
         public bool IsSynced { get; set; }
+        public bool HasApprovePermission { get; set; }
+
+
     }
 
     public class UpdateVerificationStatusModel

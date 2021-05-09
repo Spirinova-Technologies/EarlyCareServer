@@ -18,19 +18,22 @@ namespace EarlyCare.Core.Repositories
         {
         }
 
-        public async Task UpdateVerificationStatus(UpdateVerificationStatusModel statusModel)
+        public async Task<Food> UpdateVerificationStatus(UpdateVerificationStatusModel statusModel)
         {
-            var query = @"Update Food set IsVerified = @IsVerified,  UpdatedBy= @updatedBy, UpdatedOn =@updatedOn where id = @id ";
+            var query = @"Update Food set IsVerified = @isVerified,  UpdatedBy= @updatedBy, UpdatedOn =@updatedOn where Id = @id;
+                          Select * from Food where Id = @id";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
-                await connection.QueryAsync(query, new
+                var response = await connection.QueryAsync<Food>(query, new
                 {
                     id = statusModel.Id,
                     isVerified = statusModel.MarkVerified,
                     updatedBy = statusModel.UserId,
                     updatedOn = DateTime.Now
                 });
+
+                return response.FirstOrDefault();
             }
         }
 
@@ -62,22 +65,22 @@ namespace EarlyCare.Core.Repositories
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
-                var result = await connection.QueryAsync<Food>(query, new {userId });
+                var result = await connection.QueryAsync<Food>(query, new { userId });
 
                 return result.FirstOrDefault();
             }
         }
 
-        public async Task<List<FoodResponseModel>> GetFoods(int cityId, int? userType)
+        public async Task<List<FoodResponseModel>> GetFoods(int cityId, bool hasApprovePermission)
         {
             string whereClause = string.Empty;
-            if (!userType.HasValue || userType.Value != 2)
+            if (!hasApprovePermission)
             {
                 whereClause = " and f.IsVerified = 1";
             }
 
             var query = $@"select f.Id, f.Name,f.Address,f.Area,f.PhoneNumber,f.RegistrationNumber,f.Charges, f.Delivery, f.FoodServed, f.Type, f.IsVerified, f.IsSynced,
-                            f.UpdatedOn,  u.FullName as UpdatedBy, 
+                            f.UpdatedOn,  u.FullName as UpdatedBy, {hasApprovePermission} as HasApprovePermission,
                             c.Name as City from Food f
 						    join User u on u.id = f.UpdatedBy
                             join Cities c on c.id = f.CityId
@@ -110,12 +113,12 @@ namespace EarlyCare.Core.Repositories
                     var result = await connection.QueryAsync<Food>(query, new
                     {
                         name = food.Name,
-                        address= food.Address,
+                        address = food.Address,
                         area = food.Area,
                         phoneNumber = food.PhoneNumber,
                         charges = food.Charges,
                         registrationNumber = food.RegistrationNumber,
-                        delivery= food.Delivery,
+                        delivery = food.Delivery,
                         foodServed = food.FoodServed,
                         isVerified = food.IsVerified,
                         createdOn = DateTime.Now,
@@ -150,7 +153,7 @@ namespace EarlyCare.Core.Repositories
                 {
                     var result = await connection.QueryAsync<Food>(query, new
                     {
-                        id= food.Id,
+                        id = food.Id,
                         name = food.Name,
                         address = food.Address,
                         area = food.Area,

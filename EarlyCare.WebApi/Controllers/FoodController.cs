@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Http;
@@ -21,18 +22,26 @@ namespace EarlyCare.WebApi.Controllers
         private readonly IMapper _mapper;
         private readonly IFoodRepository _foodRepository;
         private readonly ILogger<FoodController> _logger;
+        private readonly IEmailService _emailService;
+        private readonly IUserRepository _userRepository;
 
-        public FoodController(IMapper mapper, ILogger<FoodController> logger, IFoodRepository foodRepository)
+        public FoodController(IMapper mapper, ILogger<FoodController> logger, IFoodRepository foodRepository, IEmailService emailService, IUserRepository userRepository)
         {
             _mapper = mapper;
             _logger = logger;
             _foodRepository = foodRepository;
+            _emailService = emailService;
+            _userRepository = userRepository;
         }
 
         [HttpGet("getFoods")]
-        public async Task<IActionResult> GetFoods([Required] int cityId, int? userType)
+        public async Task<IActionResult> GetFoods([Required] int cityId, int? userId)
         {
-            var response = await _foodRepository.GetFoods(cityId, userType);
+            var user = userId.HasValue ? await _userRepository.GetUserById(userId.Value) : null;
+
+            var hasApprovePermission = user != null && (user.UserType == 1 || (user.UserType == 2 && user.IsVerified == true));
+
+            var response = await _foodRepository.GetFoods(cityId, hasApprovePermission);
 
             return Ok(response);
         }
@@ -101,7 +110,10 @@ namespace EarlyCare.WebApi.Controllers
         [HttpPost("updateVerificationStatus")]
         public async Task<IActionResult> UpdateVerificationStatus([FromBody] UpdateVerificationStatusModel statusRequestModel)
         {
-            await _foodRepository.UpdateVerificationStatus(statusRequestModel);
+            var response = await _foodRepository.UpdateVerificationStatus(statusRequestModel);
+
+            //send email
+            await _emailService.SendUpdateNotification(response.CreatedBy, Constants.FoodDetailsUpdatedEmailSubject, Constants.FoodDetailsUpdatedEmailBody);
 
             return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
         }
