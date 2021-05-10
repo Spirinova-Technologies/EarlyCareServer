@@ -13,6 +13,7 @@ namespace EarlyCare.Infrastructure.SharedModels
         public int UserType { get; set; }
         public int CityId { get; set; }
         public List<ServiceData> Services { get; set; }
+        public bool IsVerified { get; set; }
     }
 
     public class ServiceData

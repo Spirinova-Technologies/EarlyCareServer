@@ -140,7 +140,7 @@ namespace EarlyCare.WebApi.Controllers
             var userServices = await _userRepository.GetUsersServices(user.Id);
             var response = _userService.GenerateUserResponse(user, userServices);
 
-            return Ok(new BaseResponseModel { Status = 1, Message = "User crated successfully", Result = response });
+            return Ok(new BaseResponseModel { Status = 1, Result = response });
         }
 
         [NonAction]

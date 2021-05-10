@@ -39,7 +39,8 @@ namespace EarlyCare.Core.Services
                 MobileNumber = user.MobileNumber,
                 ProfilePhoto = user.ProfilePhoto,
                 UserType = user.UserType,
-                CityId = user.CityId
+                CityId = user.CityId,
+                IsVerified= user.IsVerified
             };
 
             response.Services = services.Select(p => new ServiceData()
