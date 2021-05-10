@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
@@ -64,7 +65,7 @@ namespace EarlyCare.WebApi.Controllers
                 CovidNegativeDate = plasmaRequestModel.CovidNegativeDate,
                 CovidPositiveDate = plasmaRequestModel.CovidPositiveDate,
                 CreatedBy = plasmaRequestModel.UserId,
-                CreatedOn = DateTime.Now,
+                CreatedOn = Utilities.GetCurrentTime(),
                 DonorType = plasmaRequestModel.DonorType,
                 IsVerified = false,
                 IsAntibodyReportAvailable = plasmaRequestModel.IsAntibodyReportAvailable,
@@ -72,7 +73,7 @@ namespace EarlyCare.WebApi.Controllers
                 Name = plasmaRequestModel.Name,
                 PhoneNumber = plasmaRequestModel.PhoneNumber,
                 UpdatedBy = plasmaRequestModel.UserId,
-                UpdatedOn = DateTime.Now
+                UpdatedOn = Utilities.GetCurrentTime()
             };
 
             var response = await _plasmaRepository.InsertPlasma(plasma);
@@ -98,7 +99,7 @@ namespace EarlyCare.WebApi.Controllers
                 Name = plasmaRequestModel.Name,
                 PhoneNumber = plasmaRequestModel.PhoneNumber,
                 UpdatedBy = plasmaRequestModel.UserId,
-                UpdatedOn = DateTime.Now
+                UpdatedOn = Utilities.GetCurrentTime()
             };
 
             var response = await _plasmaRepository.UpdatePlasma(plasma);

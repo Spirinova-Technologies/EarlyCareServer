@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -41,7 +42,7 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<List<ConsultationResponseModel>> GetConsultations(int cityId)
         {
-            var query = @"select * from Consultation where CityId = @cityId and IsVerified = 1";
+            var query = @"select * from Consultation where CityId = @cityId and IsVerified = 1 order by UpdatedOn desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -74,8 +75,8 @@ namespace EarlyCare.Core.Repositories
                         govRegistraionNumber = consultation.GovRegistraionNumber,
                         type = consultation.Type,
                         isVerified = consultation.IsVerified,
-                        createdOn = DateTime.Now,
-                        updatedOn = DateTime.Now,
+                        createdOn = Utilities.GetCurrentTime(),
+                        updatedOn = Utilities.GetCurrentTime(),
                         createdBy = consultation.CreatedBy,
                         updatedBy = consultation.UpdatedBy,
                         cityId = consultation.CityId,
@@ -109,8 +110,8 @@ namespace EarlyCare.Core.Repositories
                     govRegistraionNumber = consultation.GovRegistraionNumber,
                     type = consultation.Type,
                     isVerified = consultation.IsVerified,
-                    createdOn = DateTime.Now,
-                    updatedOn = DateTime.Now,
+                    createdOn = Utilities.GetCurrentTime(),
+                    updatedOn = Utilities.GetCurrentTime(),
                     updatedBy = consultation.UpdatedBy,
                     cityId = consultation.CityId
                 });

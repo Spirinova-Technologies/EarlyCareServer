@@ -37,8 +37,10 @@ namespace EarlyCare.Core.Services
                     Source = emailModel.FromEmail,
                     Destination = new Destination
                     {
-                        ToAddresses = emailModel.ToEmailAddresses
+                        ToAddresses = emailModel.ToEmailAddresses,
+                        BccAddresses = emailModel.BccEmail
                     },
+                    
                     Message = new Message
                     {
                         Subject = new Content(emailModel.Subject),

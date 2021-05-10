@@ -22,8 +22,8 @@ namespace EarlyCare.Core.Services
             var userToken = new UserToken
             {
                 UserId = userId,
-                Expiration = DateTime.Now.AddDays(365),
-                IssuedAt = DateTime.Now
+                Expiration = Utilities.GetCurrentTime().AddDays(365),
+                IssuedAt = Utilities.GetCurrentTime()
             };
 
             var payload = UserToken.ConvertToJwtToken(userToken);
@@ -39,7 +39,7 @@ namespace EarlyCare.Core.Services
                 var jwtToken = JWT.Decode<JwtToken>(authToken, Encoding.UTF8.GetBytes(configuration["Jwt:Key"]), JwsAlgorithm.HS512);
                 decodedToken = UserToken.ConvertFromJwtToken(jwtToken);
 
-                var isExpired = DateTime.Now > decodedToken.Expiration;
+                var isExpired = Utilities.GetCurrentTime() > decodedToken.Expiration;
 
                 return !isExpired;
             }

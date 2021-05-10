@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -92,7 +93,7 @@ namespace EarlyCare.Core.Repositories
                     phoneNumber2 = hospital.PhoneNumber2,
                     phoneNumber3 = hospital.PhoneNumber3,
                     phoneNumber4 = hospital.PhoneNumber4,
-                    createdAt = DateTime.Now,
+                    createdAt = Utilities.GetCurrentTime(),
                     modifiedAt = hospital.ModifiedAt,
                     createdBy = hospital.CreatedBy,
                     updatedBy = hospital.UpdatedBy,
@@ -190,7 +191,7 @@ namespace EarlyCare.Core.Repositories
             }
 
             var query = $@"select h.* , c.Name as City  from Hospitals h
-                          join Cities c on c.id = h.CityId  where CityId = @cityId {whereCluase}";
+                          join Cities c on c.id = h.CityId  where CityId = @cityId {whereCluase}  order by h.ModifiedAt desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {

@@ -20,6 +20,10 @@
         public const string OxygenUpdatedEmailSubject = "Oxygen details has beed approved";
         public const string FoodDetailsUpdatedEmailBody = "Your food details approved";
         public const string FoodDetailsUpdatedEmailSubject = "Oxygen details has beed approved";
+        public const string VolunteerApprovedEmailSubject = "Volunteer has been approved.";
+        public const string VolunteerApprovedEmailBody = "Volunteer {0} has been approved by {1}";
+        public const string VolunteerUnapprovedEmailSubject = "Volunteer has been approved.";
+        public const string VolunteerUnapprovedEmailBody = "Volunteer {0} has been unapproved by {1}";
     }
 
     public static class GoogleSheetNameConstants

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -20,15 +20,17 @@ namespace EarlyCare.WebApi.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IOtpService _otpService;
         private readonly ILogger<UsersController> _logger;
+        private readonly IEmailService _emailService;
 
         public UsersController(IMapper mapper, ILogger<UsersController> logger, IUserService userService,
-            IOtpService otpService, IUserRepository userRepository)
+            IOtpService otpService, IUserRepository userRepository, IEmailService emailService)
         {
             _mapper = mapper;
             _logger = logger;
             _userService = userService;
             _otpService = otpService;
             _userRepository = userRepository;
+            _emailService = emailService;
         }
 
         [HttpPost("sendOtp")]
@@ -110,11 +112,14 @@ namespace EarlyCare.WebApi.Controllers
             return Ok(new BaseResponseModel { Status = 1, Message = "User updated successfully", Result = response });
         }
 
-
         [HttpGet("getVolunteers")]
-        public async Task<IActionResult> GetVolunteers()
+        public async Task<IActionResult> GetVolunteers(int? userId)
         {
-            var response = await _userService.GetVolunteers();
+            var user = userId.HasValue ? await _userRepository.GetUserById(userId.Value) : null;
+
+            var hasApprovePermission = user != null && (user.UserType == 1);
+
+            var response = await _userService.GetVolunteers(hasApprovePermission);
 
             return Ok(new BaseResponseModel { Status = 1, Result = response });
         }
@@ -165,6 +170,20 @@ namespace EarlyCare.WebApi.Controllers
             });
         }
 
+        [HttpPost("updateVerificationStatus")]
+        public async Task<IActionResult> UpdateVerificationStatus([FromBody] UpdateVerificationStatusModel statusRequestModel)
+        {
+            var response = await _userRepository.UpdateVerificationStatus(statusRequestModel);
 
+            var subject = statusRequestModel.MarkVerified == true ? Constants.VolunteerApprovedEmailSubject : Constants.VolunteerUnapprovedEmailSubject;
+            var body = statusRequestModel.MarkVerified == true ?
+                string.Format(Constants.VolunteerApprovedEmailBody, response.FullName, response.ApprovedByUser) :
+                string.Format(Constants.VolunteerUnapprovedEmailBody, response.FullName, response.ApprovedByUser);
+
+            //send email
+            await _emailService.SendUpdateNotification(response.Id, subject, body);
+
+            return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
+        }
     }
 }

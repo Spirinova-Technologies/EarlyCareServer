@@ -11,7 +11,7 @@ namespace EarlyCare.Core.Interfaces
 
         Task<User> InsertUser(User user);
 
-        Task<List<User>> GetVolunteers();
+        Task<List<User>> GetVolunteers(bool showAll);
 
         Task<User> GetVolunteer(int volunteerId);
 

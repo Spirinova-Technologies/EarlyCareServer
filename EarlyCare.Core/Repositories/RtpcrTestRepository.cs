@@ -30,7 +30,7 @@ namespace EarlyCare.Core.Repositories
         public async Task<List<RtpcrTest>> GetRtpcrTests(int cityId)
         {
             var query = @"select * from RTPCRTest
-                         where CityId = @cityId";
+                         where CityId = @cityId  order by UpdatedOn desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {

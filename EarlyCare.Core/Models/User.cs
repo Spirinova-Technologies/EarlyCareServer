@@ -16,5 +16,8 @@ namespace EarlyCare.Core.Models
         public int UserType { get; set; }
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
+        public int ApprovedBy { get; set; }
+        public string ApprovedByUser { get; set; }
+        public string HasApprovePermission { get; set; }
     }
 }

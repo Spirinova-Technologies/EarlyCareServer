@@ -1,5 +1,6 @@
 ﻿using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.SharedModels;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
@@ -116,7 +117,7 @@ namespace EarlyCare.Core.Services
                         IsAvailableICU = row[6].ToString().Trim() == "Available" ? true : false,
                         CityId = cities.First(x => x.Name.Trim() == row[9].ToString()).Id,
                         Address = row[10].ToString(),
-                        ModifiedAt = DateTime.Now,
+                        ModifiedAt = Utilities.GetCurrentTime(),
                         UpdatedBy = userId,
                         CreatedBy = userId,
                         Latitude = "0",
@@ -154,8 +155,8 @@ namespace EarlyCare.Core.Services
                         IsAntibodyReportAvailable = row[7].ToString().Trim() == "NA" ? false : true,
                         DonorType = row[8].ToString(),
                         CityId = cities.First(x => x.Name.Trim() == row[9].ToString()).Id,
-                        CreatedOn = DateTime.Now,
-                        UpdatedOn = DateTime.Now,
+                        CreatedOn = Utilities.GetCurrentTime(),
+                        UpdatedOn = Utilities.GetCurrentTime(),
                         UpdatedBy = userId,
                         CreatedBy = userId,
                         IsVerified = true,
@@ -191,8 +192,8 @@ namespace EarlyCare.Core.Services
                         GovRegistraionNumber = row[6].ToString() == "NA" ? string.Empty : row[6].ToString(),
                         CityId = cities.First(x => x.Name.Trim() == row[3].ToString()).Id,
                         IsVerified = true,
-                        CreatedOn = DateTime.Now,
-                        UpdatedOn = DateTime.Now,
+                        CreatedOn = Utilities.GetCurrentTime(),
+                        UpdatedOn = Utilities.GetCurrentTime(),
                         UpdatedBy = userId,
                         CreatedBy = userId,
                         IsSynced = true
@@ -226,8 +227,8 @@ namespace EarlyCare.Core.Services
                         GovRegistraionNumber = row[5].ToString() == "NA" ? string.Empty : row[5].ToString(),
                         CityId = cities.First(x => x.Name.Trim() == row[6].ToString()).Id,
                         IsVerified = true,
-                        CreatedOn = DateTime.Now,
-                        UpdatedOn = DateTime.Now,
+                        CreatedOn = Utilities.GetCurrentTime(),
+                        UpdatedOn = Utilities.GetCurrentTime(),
                         UpdatedBy = userId,
                         CreatedBy = userId,
                         IsSynced = true
@@ -260,8 +261,8 @@ namespace EarlyCare.Core.Services
                         GovPhoneNumber = row[5].ToString() == "NA" ? string.Empty : row[5].ToString(),
                         CityId = cities.First(x => x.Name.Trim() == row[3].ToString()).Id,
                         IsVerified = true,
-                        CreatedOn = DateTime.Now,
-                        UpdatedOn = DateTime.Now,
+                        CreatedOn = Utilities.GetCurrentTime(),
+                        UpdatedOn = Utilities.GetCurrentTime(),
                         UpdatedBy = userId,
                         CreatedBy = userId,
                         IsSynced = true
@@ -298,8 +299,8 @@ namespace EarlyCare.Core.Services
                         RegistrationNumber = row[8].ToString() == "NA" ? string.Empty : row[8].ToString(),
                         CityId = cities.First(x => x.Name.Trim() == row[9].ToString()).Id,
                         IsVerified = true,
-                        CreatedOn = DateTime.Now,
-                        UpdatedOn = DateTime.Now,
+                        CreatedOn = Utilities.GetCurrentTime(),
+                        UpdatedOn = Utilities.GetCurrentTime(),
                         UpdatedBy = userId,
                         CreatedBy = userId,
                         IsSynced = true
@@ -335,8 +336,8 @@ namespace EarlyCare.Core.Services
                         ProviderType = row[6].ToString(),
                         CityId = cities.First(x => x.Name.Trim() == row[7].ToString()).Id,
                         IsVerified = true,
-                        CreatedOn = DateTime.Now,
-                        UpdatedOn = DateTime.Now,
+                        CreatedOn = Utilities.GetCurrentTime(),
+                        UpdatedOn = Utilities.GetCurrentTime(),
                         UpdatedBy = userId,
                         CreatedBy = userId,
                         IsSynced = true

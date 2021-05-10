@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -45,7 +46,7 @@ namespace EarlyCare.Core.Repositories
                             a.UpdatedOn,  u.FullName as UpdatedBy, a.AmbulanceType , a.ProviderType,  c.Name as City from Ambulance a
                             join User u on u.id = a.UpdatedBy
                             join Cities c on c.id = a.CityId
-                            where a.CityId = @cityId and a.IsVerified = 1";
+                            where a.CityId = @cityId and a.IsVerified = 1 order by a.UpdatedOn desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -78,8 +79,8 @@ namespace EarlyCare.Core.Repositories
                         numberOfAmbulances = ambulance.NumberOfAmbulances,
                         providerType = ambulance.ProviderType,
                         isVerified = ambulance.IsVerified,
-                        createdOn = DateTime.Now,
-                        updatedOn = DateTime.Now,
+                        createdOn = Utilities.GetCurrentTime(),
+                        updatedOn = Utilities.GetCurrentTime(),
                         createdBy = ambulance.CreatedBy,
                         updatedBy = ambulance.UpdatedBy,
                         cityId = ambulance.CityId,
@@ -117,7 +118,7 @@ namespace EarlyCare.Core.Repositories
                         numberOfAmbulances = ambulance.NumberOfAmbulances,
                         providerType = ambulance.ProviderType,
                         isVerified = ambulance.IsVerified,
-                        updatedOn = DateTime.Now,
+                        updatedOn = Utilities.GetCurrentTime(),
                         updatedBy = 0,
                         cityId = ambulance.CityId
                     });

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -30,7 +31,7 @@ namespace EarlyCare.Core.Repositories
                     id = statusModel.Id,
                     isVerified = statusModel.MarkVerified,
                     updatedBy = statusModel.UserId,
-                    updatedOn = DateTime.Now
+                    updatedOn = Utilities.GetCurrentTime()
                 });
 
                 return response.FirstOrDefault();
@@ -61,7 +62,7 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<Food> GetFoodByUserId(int userId)
         {
-            var query = @"SELECT * from Food where CreatedBy = @userId ";
+            var query = @"SELECT * from Food where CreatedBy = @userId AND IsSynced = false";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -84,7 +85,7 @@ namespace EarlyCare.Core.Repositories
                             c.Name as City from Food f
 						    join User u on u.id = f.UpdatedBy
                             join Cities c on c.id = f.CityId
-                            where f.CityId = @cityId {whereClause}";
+                            where f.CityId = @cityId {whereClause}  order by f.UpdatedOn desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -121,8 +122,8 @@ namespace EarlyCare.Core.Repositories
                         delivery = food.Delivery,
                         foodServed = food.FoodServed,
                         isVerified = food.IsVerified,
-                        createdOn = DateTime.Now,
-                        updatedOn = DateTime.Now,
+                        createdOn = Utilities.GetCurrentTime(),
+                        updatedOn = Utilities.GetCurrentTime(),
                         createdBy = food.CreatedBy,
                         updatedBy = food.UpdatedBy,
                         type = food.Type,
@@ -163,7 +164,7 @@ namespace EarlyCare.Core.Repositories
                         delivery = food.Delivery,
                         foodServed = food.FoodServed,
                         isVerified = food.IsVerified,
-                        updatedOn = DateTime.Now,
+                        updatedOn = Utilities.GetCurrentTime(),
                         updatedBy = food.UpdatedBy,
                         type = food.Type,
                         cityId = food.CityId

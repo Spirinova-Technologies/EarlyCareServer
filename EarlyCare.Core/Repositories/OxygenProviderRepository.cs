@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
@@ -32,8 +33,8 @@ namespace EarlyCare.Core.Repositories
                     id = statusModel.Id,
                     isVerified = statusModel.MarkVerified,
                     updatedBy = statusModel.UserId,
-                    updatedOn = DateTime.Now
-                });
+                    updatedOn = Utilities.GetCurrentTime()
+              });
 
                return response.FirstOrDefault();
             }
@@ -64,7 +65,7 @@ namespace EarlyCare.Core.Repositories
 
         public async Task<OxygenProvider> GetOxygenProviderByUserId(int userId)
         {
-            var query = @"SELECT * from OxygenProvider where CreatedBy = @userId ";
+            var query = @"SELECT * from OxygenProvider where CreatedBy = @userId  AND IsSynced = false";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -87,7 +88,7 @@ namespace EarlyCare.Core.Repositories
                             c.Name as City from OxygenProvider o
 	                        join User u on u.id = o.UpdatedBy
 	                        join Cities c on c.id = o.CityId
-                            where o.CityId = @cityId {whereClause}";
+                            where o.CityId = @cityId {whereClause}  order by o.UpdatedOn desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -120,8 +121,8 @@ namespace EarlyCare.Core.Repositories
                         charges = oxygenProvider.Charges,
                         govRegistraionNumber = oxygenProvider.GovRegistraionNumber,
                         isVerified = oxygenProvider.IsVerified,
-                        createdOn = DateTime.Now,
-                        updatedOn = DateTime.Now,
+                        createdOn = Utilities.GetCurrentTime(),
+                        updatedOn = Utilities.GetCurrentTime(),
                         createdBy = oxygenProvider.CreatedBy,
                         updatedBy = oxygenProvider.UpdatedBy,
                         type = oxygenProvider.Type,
@@ -159,7 +160,7 @@ namespace EarlyCare.Core.Repositories
                         charges = oxygenProvider.Charges,
                         govRegistraionNumber = oxygenProvider.GovRegistraionNumber,
                         isVerified = oxygenProvider.IsVerified,
-                        updatedOn = DateTime.Now,
+                        updatedOn = Utilities.GetCurrentTime(),
                         updatedBy = oxygenProvider.UpdatedOn,
                         type = oxygenProvider.Type,
                         cityId = oxygenProvider.CityId

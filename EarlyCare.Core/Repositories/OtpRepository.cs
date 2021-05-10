@@ -8,6 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EarlyCare.Infrastructure;
 
 namespace EarlyCare.Core.Repositories
 {
@@ -29,8 +30,8 @@ namespace EarlyCare.Core.Repositories
                     mobile = otpDetails.MobileNumber,
                     otp = otpDetails.Otp,
                     verify = otpDetails.IsVerified,
-                    created = DateTime.Now,
-                    modified = DateTime.Now
+                    created = Utilities.GetCurrentTime(),
+                    modified = Utilities.GetCurrentTime()
                 });
 
                 return result.FirstOrDefault();

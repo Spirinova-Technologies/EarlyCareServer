@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,7 @@ namespace EarlyCare.Core.Repositories
                     id = plasmaStatusModel.Id,
                     isVerified = plasmaStatusModel.MarkVerified,
                     updatedBy = plasmaStatusModel.UserId,
-                    updatedOn = DateTime.Now
+                    updatedOn = Utilities.GetCurrentTime()
                 });
                 return response.FirstOrDefault();
             }
@@ -60,7 +61,7 @@ namespace EarlyCare.Core.Repositories
                            {hasApprovePermission} as HasApprovePermission from PlasmaDonor p
                           join User u on u.id = p.UpdatedBy
                           join Cities c on c.id = p.CityId
-                          where p.CityId = @cityId {whereClause}";
+                          where p.CityId = @cityId {whereClause} order by p.UpdatedOn desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -77,7 +78,7 @@ namespace EarlyCare.Core.Repositories
         {
             var query = @"select p.* from PlasmaDonor p
                           join User u on u.id = p.CreatedBy
-                          where u.Id = @userId ";
+                          where u.Id = @userId  AND p.IsSynced = false";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -126,8 +127,8 @@ namespace EarlyCare.Core.Repositories
                         covidPositiveDate = plasma.CovidPositiveDate,
                         covidNegativeDate = plasma.CovidNegativeDate,
                         isVerified = plasma.IsVerified,
-                        createdOn = DateTime.Now,
-                        updatedOn = DateTime.Now,
+                        createdOn = Utilities.GetCurrentTime(),
+                        updatedOn = Utilities.GetCurrentTime(),
                         createdBy = plasma.CreatedBy,
                         updatedBy = plasma.UpdatedBy,
                         donorType = plasma.DonorType,
@@ -169,7 +170,7 @@ namespace EarlyCare.Core.Repositories
                         covidPositiveDate = plasma.CovidPositiveDate,
                         covidNegativeDate = plasma.CovidNegativeDate,
                         isVerified = plasma.IsVerified,
-                        updatedOn = DateTime.Now,
+                        updatedOn = Utilities.GetCurrentTime(),
                         updatedBy = plasma.UpdatedBy,
                         donorType = plasma.DonorType,
                         cityId = plasma.CityId

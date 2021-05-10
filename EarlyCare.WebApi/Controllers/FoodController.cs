@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
@@ -68,12 +69,12 @@ namespace EarlyCare.WebApi.Controllers
                 Type = foodDetailsRequestModel.Type,
                 CityId = foodDetailsRequestModel.CityId,
                 CreatedBy = foodDetailsRequestModel.UserId,
-                CreatedOn = DateTime.Now,
+                CreatedOn = Utilities.GetCurrentTime(),
                 IsVerified = false,
                 Name = foodDetailsRequestModel.Name,
                 PhoneNumber = foodDetailsRequestModel.PhoneNumber,
                 UpdatedBy = foodDetailsRequestModel.UserId,
-                UpdatedOn = DateTime.Now
+                UpdatedOn = Utilities.GetCurrentTime()
             };
 
             var response = await _foodRepository.InsertFood(oxygenProvider);
@@ -99,7 +100,7 @@ namespace EarlyCare.WebApi.Controllers
                 Name = foodDetailsRequestModel.Name,
                 PhoneNumber = foodDetailsRequestModel.PhoneNumber,
                 UpdatedBy = foodDetailsRequestModel.UserId,
-                UpdatedOn = DateTime.Now
+                UpdatedOn = Utilities.GetCurrentTime()
             };
 
             var response = await _foodRepository.UpdateFood(oxygenProvider);

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
@@ -73,12 +74,12 @@ namespace EarlyCare.WebApi.Controllers
                 Type = oxygenDetailsRequestModel.Type,
                 CityId = oxygenDetailsRequestModel.CityId,
                 CreatedBy = oxygenDetailsRequestModel.UserId,
-                CreatedOn = DateTime.Now,
+                CreatedOn = Utilities.GetCurrentTime(),
                 IsVerified = false,
                 Name = oxygenDetailsRequestModel.Name,
                 PhoneNumber = oxygenDetailsRequestModel.PhoneNumber,
                 UpdatedBy = oxygenDetailsRequestModel.UserId,
-                UpdatedOn = DateTime.Now
+                UpdatedOn = Utilities.GetCurrentTime()
             };
 
             var response = await _oxygenProviderRepository.InsertOxygenProvider(oxygenProvider);
@@ -101,7 +102,7 @@ namespace EarlyCare.WebApi.Controllers
                 Name = oxygenDetailsRequestModel.Name,
                 PhoneNumber = oxygenDetailsRequestModel.PhoneNumber,
                 UpdatedBy = oxygenDetailsRequestModel.UserId,
-                UpdatedOn = DateTime.Now
+                UpdatedOn = Utilities.GetCurrentTime()
             };
 
             var response = await _oxygenProviderRepository.UpdateOxygenProvider(oxygenProvider);

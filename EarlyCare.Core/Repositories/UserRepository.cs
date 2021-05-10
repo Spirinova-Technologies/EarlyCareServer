@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
+using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -28,6 +30,29 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
+        public async Task<User> UpdateVerificationStatus(UpdateVerificationStatusModel statusModel)
+        {
+            var query = @"Update User set IsVerified = @IsVerified, ApprovedBy= @approvedBy, Modified =@modified where id = @id ;
+
+                         SELECT u1.*, u2.FullName AS ApprovedByUser
+                         FROM User u1
+                         Left JOIN User u2
+                         ON u1.ApprovedBy = u2.Id where u1.Id = @id ";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var response = await connection.QueryAsync<User>(query, new
+                {
+                    id = statusModel.Id,
+                    isVerified = statusModel.MarkVerified,
+                    approvedBy = statusModel.UserId,
+                    modified = Utilities.GetCurrentTime()
+                });
+
+                return response.FirstOrDefault();
+            }
+        }
+
         public async Task<User> GetUserById(int userId)
         {
             var query = @"SELECT * FROM User WHERE Id=@userId";
@@ -40,9 +65,20 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
-        public async Task<List<User>> GetVolunteers()
+        public async Task<List<User>> GetVolunteers(bool hasApprovePermission)
         {
-            var query = @"SELECT * FROM User where  UserType = 2";
+            var whereClause = string.Empty;
+
+            if (!hasApprovePermission)
+            {
+                whereClause = "and u1.IsVerified = true";
+            }
+
+            var query = $@"SELECT u1.*, u2.FullName AS ApprovedByUser, {hasApprovePermission} as HasApprovePermission
+                         FROM User u1
+                         Left JOIN User u2
+                         ON u1.ApprovedBy = u2.Id
+                         where  u1.UserType = 2 {whereClause}";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -86,8 +122,8 @@ namespace EarlyCare.Core.Repositories
                     profilePhoto = user.ProfilePhoto,
                     socialId = "",
                     isActive = 1,
-                    created = DateTime.Now,
-                    modified = DateTime.Now
+                    created = Utilities.GetCurrentTime(),
+                    modified = Utilities.GetCurrentTime()
                 });
 
                 return result.FirstOrDefault();

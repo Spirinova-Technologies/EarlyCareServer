@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
+using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.SharedModels;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -42,7 +43,7 @@ namespace EarlyCare.Core.Repositories
         public async Task<List<DrugsResponseModel>> GetDrugProviders(int cityId)
         {
             var query = @"Select *,  Name as SupplierName from Drugs
-                            where CityId = @cityId";
+                            where CityId = @cityId  order by UpdatedOn desc";
 
             using (IDbConnection connection = await OpenConnectionAsync())
             {
@@ -73,8 +74,8 @@ namespace EarlyCare.Core.Repositories
                         coordinator = drug.Coordinator,
                         govPhoneNumber = drug.GovPhoneNumber,
                         isVerified = drug.IsVerified,
-                        createdOn = DateTime.Now,
-                        updatedOn = DateTime.Now,
+                        createdOn = Utilities.GetCurrentTime(),
+                        updatedOn = Utilities.GetCurrentTime(),
                         createdBy = drug.CreatedBy,
                         updatedBy = drug.UpdatedBy,
                         cityId = drug.CityId,
@@ -108,7 +109,7 @@ namespace EarlyCare.Core.Repositories
                         coordinator = drug.Coordinator,
                         govPhoneNumber = drug.GovPhoneNumber,
                         isVerified = drug.IsVerified,
-                        updatedOn = DateTime.Now,
+                        updatedOn = Utilities.GetCurrentTime(),
                         updatedBy = drug.UpdatedBy,
                         cityId = drug.CityId,
                          isSynced = drug.IsSynced

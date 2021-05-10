@@ -62,9 +62,9 @@ namespace EarlyCare.Core.Services
             return await _userRepository.GetVolunteer(volunteerId);
         }
 
-        public async Task<List<User>> GetVolunteers()
+        public async Task<List<User>> GetVolunteers(bool showAll)
         {
-            return await _userRepository.GetVolunteers();
+            return await _userRepository.GetVolunteers(showAll);
         }
 
         public async Task<User> InsertUser(User user)

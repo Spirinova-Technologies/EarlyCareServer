@@ -42,8 +42,8 @@ namespace EarlyCare.Core.Services
             var emailSettings = await GetGlobalEmailSettings();
             var emailModel = new EmailModel
             {
-                Body = subject,
-                Subject = body,
+                Body = body,
+                Subject = subject,
                 FromEmail = emailSettings.Item1,
                 ToEmailAddresses = new List<string> { user.Email },
                 BccEmail = emailSettings.Item2
