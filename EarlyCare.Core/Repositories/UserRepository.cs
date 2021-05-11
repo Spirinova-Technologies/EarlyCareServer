@@ -65,6 +65,18 @@ namespace EarlyCare.Core.Repositories
             }
         }
 
+        public async Task<string> GetUserNameById(int userId)
+        {
+            var query = @"SELECT FullName FROM User WHERE Id=@userId";
+
+            using (IDbConnection connection = await OpenConnectionAsync())
+            {
+                var result = await connection.QueryAsync<string>(query, new { userId });
+
+                return result.FirstOrDefault();
+            }
+        }
+
         public async Task<List<User>> GetVolunteers(bool hasApprovePermission)
         {
             var whereClause = string.Empty;

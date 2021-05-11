@@ -56,9 +56,18 @@ namespace EarlyCare.WebApi.Controllers
         {
            var response = await _oxygenProviderRepository.UpdateVerificationStatus(updateRequestModel);
 
-            //send email
-            await _emailService.SendUpdateNotification(response.CreatedBy, Constants.OxygenUpdatedEmailSubject, Constants.OxygenDetailsUpdatedEmailBody);
+            if (updateRequestModel.MarkVerified)
+            {
+                var updatedBy = await _userRepository.GetUserNameById(response.UpdatedBy);
+                var userName = await _userRepository.GetUserNameById(response.CreatedBy);
 
+                //send email
+                await _emailService.SendUpdateNotification(response.CreatedBy,
+                    Constants.OxygenUpdatedEmailSubject,
+                    string.Format(Constants.OxygenDetailsUpdatedEmailBody, userName, updatedBy));
+            }
+
+            //send email
             return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
         }
 

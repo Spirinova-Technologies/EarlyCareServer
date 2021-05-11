@@ -1,0 +1,12 @@
+
+{
+    "comment" : "This file is used to help set default values when using the dotnet CLI extension Amazon.ElasticBeanstalk.Tools. For more information run \"dotnet eb --help\" from the project root.",
+    "profile" : "Rohidas Kadam",
+    "region"  : "ap-south-1",
+    "application" : "EarlyCure-Dev",
+    "environment" : "Earlycure-dev-env",
+    "solution-stack" : "64bit Windows Server 2019 v2.6.4 running IIS 10.0",
+    "iis-website"    : "Default Web Site",
+    "app-path"       : "/",
+    "enable-xray"    : false
+}

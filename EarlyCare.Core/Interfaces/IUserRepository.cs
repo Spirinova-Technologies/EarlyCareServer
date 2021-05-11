@@ -18,5 +18,6 @@ namespace EarlyCare.Core.Interfaces
         Task<User> UpdateUser(User user);
         Task DeleteUserServiceMapping(int userId);
         Task<User> UpdateVerificationStatus(UpdateVerificationStatusModel statusModel);
+        Task<string> GetUserNameById(int userId);
     }
 }

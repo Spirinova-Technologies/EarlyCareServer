@@ -112,8 +112,16 @@ namespace EarlyCare.WebApi.Controllers
         {
             var response = await _plasmaRepository.UpdateVerificationStatus(plasmaRequestModel);
 
-            //send email
-            await _emailService.SendUpdateNotification(response.CreatedBy, Constants.PlasmaDetailsUpdatedEmailSubject, Constants.PlasmaDetailsUpdatedEmailBody);
+            if (plasmaRequestModel.MarkVerified)
+            {
+                var updatedBy = await _userRepository.GetUserNameById(response.UpdatedBy);
+                var userName = await _userRepository.GetUserNameById(response.CreatedBy);
+
+                //send email
+                await _emailService.SendUpdateNotification(response.CreatedBy,
+                    Constants.PlasmaDetailsUpdatedEmailSubject,
+                    string.Format(Constants.PlasmaDetailsUpdatedEmailBody, userName, updatedBy));
+            }
 
             return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
         }

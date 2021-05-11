@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using EarlyCare.Core.Interfaces;
 using EarlyCare.Core.Models;
 using EarlyCare.Infrastructure;
 using EarlyCare.Infrastructure.Constants;
 using EarlyCare.Infrastructure.SharedModels;
 using EarlyCare.WebApi.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace EarlyCare.WebApi.Controllers
 {
@@ -113,8 +109,16 @@ namespace EarlyCare.WebApi.Controllers
         {
             var response = await _foodRepository.UpdateVerificationStatus(statusRequestModel);
 
-            //send email
-            await _emailService.SendUpdateNotification(response.CreatedBy, Constants.FoodDetailsUpdatedEmailSubject, Constants.FoodDetailsUpdatedEmailBody);
+            if (statusRequestModel.MarkVerified)
+            {
+                var updatedBy = await _userRepository.GetUserNameById(response.UpdatedBy);
+                var userName = await _userRepository.GetUserNameById(response.CreatedBy);
+
+                //send email
+                await _emailService.SendUpdateNotification(response.CreatedBy,
+                    Constants.FoodDetailsUpdatedEmailSubject,
+                    string.Format(Constants.FoodDetailsUpdatedEmailBody, userName, updatedBy));
+            }
 
             return Ok(new BaseResponseModel { Message = "Status updated successfully", Status = 1 });
         }
