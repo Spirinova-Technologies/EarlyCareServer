@@ -18,7 +18,7 @@
         public const string PlasmaDetailsUpdatedEmailSubject = "Earlycare - Plasma details verified";
         public const string OxygenDetailsUpdatedEmailBody = "Thanks {0} for registering with us as an oxygen supplier. Your details have been verified by {1}. It will be shown to users.";
         public const string OxygenUpdatedEmailSubject = "Earlycare - Oxygen details verified";
-        public const string FoodDetailsUpdatedEmailBody = "Thanks {0} for registering with us as a food/tiffin supplier. Your details have been verified ny {1}. It will be shown to users.";
+        public const string FoodDetailsUpdatedEmailBody = "Thanks {0} for registering with us as a food/tiffin supplier. Your details have been verified by {1}. It will be shown to users.";
         public const string FoodDetailsUpdatedEmailSubject = "Earlycare - Food/tiffin supplier details verified";
         public const string VolunteerApprovedEmailSubject = "Earlycare - Volunteer approved";
         public const string VolunteerApprovedEmailBody = "Thanks {0} for registering with us as a volunteer. Your registration has been approved by {1}. As a volunteer you will be able to validate/verify service providers. We show only verified suppliers in our app. So please verify a service provider before marking it as verified in the app.";
